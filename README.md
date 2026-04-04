@@ -1,7 +1,7 @@
 # The Burgess Principle — Reasonable Adjustment Companion
 
 > ⚠️ **Important**  
-> This is a personal self-advocacy tool grounded in The Burgess Principle. The generated messages and templates are for informational and assistive purposes only. They do not constitute legal advice. Laws and their application vary by individual circumstances and jurisdiction. Always review outputs carefully and consult a qualified professional where needed.
+> This is a personal self-advocacy tool grounded in The Burgess Principle. The generated messages and templates are for informational and assistive purposes only. They do not constitute legal advice. Always consult a qualified professional for legal matters.
 
 This project is licensed under the MIT License with additional terms for "The Burgess Principle" content. See the [LICENSE](LICENSE) file for full details.
 
@@ -11,13 +11,13 @@ This project is licensed under the MIT License with additional terms for "The Bu
 [![Vite](https://img.shields.io/badge/Vite-5.4-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 
-> An AI-powered advocacy companion that helps people assert their right to reasonable adjustments. Empowering individuals — especially those with hidden disabilities — to have confident, informed conversations with employers, service providers, and institutions.
+> An AI-powered advocacy companion that helps people assert their right to reasonable adjustments. Empowering individuals — especially those with hidden disabilities — to have confident, informed conversations about their needs.
 
 ---
 
 ## ✨ What Is This?
 
-The **Reasonable Adjustment Companion** is a web application built around [The Burgess Principle](https://theburgessprinciple.co.uk/) — the idea that every person deserves individual consideration for reasonable adjustments without needing to disclose a disability diagnosis.
+The **Reasonable Adjustment Companion** is a web application built around [The Burgess Principle](https://theburgessprinciple.co.uk/) — the idea that every person deserves individual consideration and adjustment based on their unique circumstances.
 
 **UK Certification Mark:** Registration #UK00004343685
 
@@ -115,6 +115,20 @@ supabase/
 ## 🤝 Contributing
 
 Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to get involved.
+
+---
+
+## If You Fork This Project
+
+The underlying code for this project is licensed under the MIT License, and you're welcome to fork, modify, and build upon it for your own purposes.
+
+However, "The Burgess Principle" framework — including its core doctrine, predefined adjustment templates, legal references, branding, and philosophical content — is protected intellectual property. "The Burgess Principle" and UK Certification Mark #UK00004343685 are trademarks owned by Lewis James Burgess.
+
+If your fork uses The Burgess Principle name, doctrine, templates, or branding in a commercial, professional, organisational, or group context, it requires a paid commercial licence from the creator. Personal forks for individual use or learning are encouraged and do not require permission.
+
+When forking, please clearly state in your README that it is a fork of advocate-companion and link back to the original repository at https://github.com/ljbudgie/advocate-companion.
+
+For licensing enquiries or commercial use of the framework, contact: lewisburgess_1987@hotmail.co.uk
 
 ---
 
