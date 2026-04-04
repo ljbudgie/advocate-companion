@@ -4,12 +4,20 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import type { UserProfile } from "@/types/burgess";
-import { Shield, Info } from "lucide-react";
+import { Shield, Info, ArrowLeft, MessageSquare, Eye, Bot } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface OnboardingScreenProps {
   onComplete: (profile: UserProfile) => void;
+  onBack?: () => void;
 }
+
+const SCENARIO_CHIPS = [
+  "Disability adjustment",
+  "Hidden disability",
+  "Unfair policy",
+  "Customer complaint",
+];
 
 const COUNTRIES = [
   "United Kingdom", "United States", "Canada", "Australia", "Ireland",
@@ -18,7 +26,7 @@ const COUNTRIES = [
   "Spain", "Italy", "Japan", "South Korea", "Brazil", "Other"
 ];
 
-export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
+export default function OnboardingScreen({ onComplete, onBack }: OnboardingScreenProps) {
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [profile, setProfile] = useState<UserProfile>({
@@ -45,6 +53,13 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
       <div className="w-full max-w-md">
         {step === 0 && (
           <div className="text-center space-y-8 animate-in fade-in duration-700">
+            {onBack && (
+              <div className="flex justify-start">
+                <Button variant="ghost" size="icon" onClick={onBack}>
+                  <ArrowLeft className="w-5 h-5" />
+                </Button>
+              </div>
+            )}
             <div className="mx-auto w-16 h-16 rounded-2xl bg-primary flex items-center justify-center">
               <Shield className="w-8 h-8 text-primary-foreground" />
             </div>
@@ -56,11 +71,25 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
                 Your companion for asserting reasonable adjustments.
               </p>
             </div>
-            <div className="bg-card rounded-xl border p-6 text-left space-y-3">
-              <p className="text-foreground text-base leading-relaxed">
-                Hi. Before we proceed, can I ask you a few questions to produce maximum results?
+            <div className="bg-card rounded-xl border p-6 text-left space-y-4">
+              <p className="text-foreground text-base font-medium">
+                Here's how it works:
               </p>
-              <p className="text-sm text-muted-foreground">
+              <div className="space-y-3">
+                <div className="flex items-start gap-3">
+                  <MessageSquare className="w-5 h-5 text-accent mt-0.5 shrink-0" />
+                  <p className="text-sm text-muted-foreground">Answer a few quick questions about your situation.</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <Eye className="w-5 h-5 text-accent mt-0.5 shrink-0" />
+                  <p className="text-sm text-muted-foreground">We'll generate a message you can show directly to the staff member on your phone.</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <Bot className="w-5 h-5 text-accent mt-0.5 shrink-0" />
+                  <p className="text-sm text-muted-foreground">Tell us what they say back, and the AI will suggest your next response — always calm, polite, and firm.</p>
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground pt-1">
                 Your information stays on your device and is never stored.
               </p>
             </div>
@@ -107,6 +136,22 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
                 <Label className="text-lg font-medium">
                   What's the issue or adjustment you need? <span className="text-muted-foreground font-normal">(optional)</span>
                 </Label>
+                <div className="flex flex-wrap gap-2">
+                  {SCENARIO_CHIPS.map((chip) => (
+                    <button
+                      key={chip}
+                      type="button"
+                      onClick={() => setProfile({ ...profile, adjustment: chip.toLowerCase() })}
+                      className={`px-3 py-1.5 rounded-full text-sm border transition-colors ${
+                        profile.adjustment === chip.toLowerCase()
+                          ? "bg-accent text-accent-foreground border-accent"
+                          : "bg-background text-muted-foreground border-border hover:border-accent/50"
+                      }`}
+                    >
+                      {chip}
+                    </button>
+                  ))}
+                </div>
                 <Input
                   value={profile.adjustment}
                   onChange={(e) => setProfile({ ...profile, adjustment: e.target.value })}
@@ -152,7 +197,7 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
             )}
 
             <div className="flex gap-3 pt-2">
-              {step > 1 && (
+              {step > 0 && (
                 <Button variant="outline" onClick={() => setStep(step - 1)} className="h-14 flex-1 text-base">
                   Back
                 </Button>
