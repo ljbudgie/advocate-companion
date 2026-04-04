@@ -28,7 +28,7 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
 
   const canProceed = () => {
     if (step === 1) return profile.fullName.trim().length > 0;
-    if (step === 2) return profile.adjustment.trim().length > 0;
+    if (step === 2) return true; // adjustment is optional
     if (step === 3) return profile.country.trim().length > 0;
     return true;
   };
