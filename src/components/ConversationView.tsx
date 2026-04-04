@@ -9,6 +9,7 @@ import { Shield, Maximize2, Copy, Mail, Send, Sparkles, RotateCcw, Info, Downloa
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
 import { useNavigate } from "react-router-dom";
+import { downloadLogPDF } from "@/lib/generateLogPDF";
 
 interface ConversationViewProps {
   conversation: SavedConversation;
