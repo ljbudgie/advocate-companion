@@ -1,12 +1,12 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import type { UserProfile, Message } from "@/types/burgess";
 import StaffDisplay from "./StaffDisplay";
 import { supabase } from "@/integrations/supabase/client";
 import { Shield, Maximize2, Copy, Mail, Send, Sparkles, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
+import ReactMarkdown from "react-markdown";
 
 interface ConversationViewProps {
   profile: UserProfile;
