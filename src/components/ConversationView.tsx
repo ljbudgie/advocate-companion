@@ -211,7 +211,7 @@ export default function ConversationView({ profile, onReset }: ConversationViewP
               <Input
                 value={aiHelper}
                 onChange={(e) => setAiHelper(e.target.value)}
-                placeholder="e.g. make it firmer, more polite, include the core question..."
+                placeholder="e.g. make it firmer, more polite, suggest another approach..."
                 className="h-10 text-sm"
                 onKeyDown={(e) => e.key === "Enter" && handleAiHelper()}
                 disabled={isLoading}
