@@ -1,18 +1,20 @@
 # The Burgess Principle — Reasonable Adjustment Companion
 
+This project is licensed under the MIT License with additional terms for "The Burgess Principle" content. See the [LICENSE](LICENSE) file for full details.
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-blue?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-18.3-61DAFB?logo=react&logoColor=white)](https://react.dev/)
 [![Vite](https://img.shields.io/badge/Vite-5.4-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 
-> An AI-powered advocacy companion that helps people assert their right to reasonable adjustments. Empowering individuals — especially those with hidden disabilities — to have confident, informed conversations about inclusion and accessibility.
+> An AI-powered advocacy companion that helps people assert their right to reasonable adjustments. Empowering individuals — especially those with hidden disabilities — to have confident, informed conversations with employers, service providers, and institutions.
 
 ---
 
 ## ✨ What Is This?
 
-The **Reasonable Adjustment Companion** is a web application built around [The Burgess Principle](https://theburgessprinciple.co.uk/) — the idea that every person deserves individual consideration rather than being subjected to blanket policies. It uses AI to generate clear, polite, and legally grounded messages that users can present to staff, organisations, or service providers when requesting reasonable adjustments.
+The **Reasonable Adjustment Companion** is a web application built around [The Burgess Principle](https://theburgessprinciple.co.uk/) — the idea that every person deserves individual consideration for reasonable adjustments without needing to disclose a disability diagnosis.
 
 **UK Certification Mark:** Registration #UK00004343685
 
