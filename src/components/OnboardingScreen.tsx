@@ -19,6 +19,7 @@ const COUNTRIES = [
 ];
 
 export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
+  const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [profile, setProfile] = useState<UserProfile>({
     fullName: "",
