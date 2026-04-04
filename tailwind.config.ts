@@ -47,6 +47,14 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        success: {
+          DEFAULT: "hsl(var(--success))",
+          foreground: "hsl(var(--success-foreground))",
+        },
+        staff: {
+          DEFAULT: "hsl(var(--staff-bg))",
+          foreground: "hsl(var(--staff-foreground))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
@@ -57,6 +65,14 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+      },
+      fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        serif: ['Source Serif 4', 'Georgia', 'serif'],
+      },
+      fontSize: {
+        'staff-xl': ['1.75rem', { lineHeight: '2.25rem', fontWeight: '600' }],
+        'staff-2xl': ['2.25rem', { lineHeight: '2.75rem', fontWeight: '700' }],
       },
       borderRadius: {
         lg: "var(--radius)",
