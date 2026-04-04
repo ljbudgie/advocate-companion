@@ -29,6 +29,7 @@ function generateOpeningMessage(profile: UserProfile): string {
 }
 
 export default function ConversationView({ profile, onReset }: ConversationViewProps) {
+  const navigate = useNavigate();
   const [messages, setMessages] = useState<Message[]>(() => {
     const opening = generateOpeningMessage(profile);
     return [{
