@@ -66,6 +66,12 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
             <Button onClick={handleNext} size="lg" className="w-full text-base h-14">
               Let's begin
             </Button>
+            <button
+              onClick={() => navigate("/about")}
+              className="flex items-center justify-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mx-auto"
+            >
+              <Info className="w-3.5 h-3.5" /> What is the Burgess Principle?
+            </button>
           </div>
         )}
 
