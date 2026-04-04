@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import type { UserProfile } from "@/types/burgess";
 import { Shield, Info, ArrowLeft, MessageSquare, Eye, Bot } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -12,11 +13,40 @@ interface OnboardingScreenProps {
   onBack?: () => void;
 }
 
-const SCENARIO_CHIPS = [
-  "Disability adjustment",
-  "Hidden disability",
-  "Unfair policy",
-  "Customer complaint",
+const ADJUSTMENT_OPTIONS = [
+  "ADHD",
+  "Anxiety",
+  "Autism / ASD",
+  "Bipolar disorder",
+  "Blind / visual impairment",
+  "Chronic fatigue / ME",
+  "Chronic pain",
+  "Coeliac disease",
+  "Crohn's disease / IBD",
+  "Deaf / hearing impairment",
+  "Depression",
+  "Diabetes",
+  "Down syndrome",
+  "Dyslexia",
+  "Dyspraxia",
+  "Ehlers-Danlos syndrome",
+  "Epilepsy",
+  "Fibromyalgia",
+  "Heart condition",
+  "Hypermobility",
+  "Learning disability",
+  "Lupus",
+  "Mental health condition",
+  "Mobility impairment",
+  "Multiple sclerosis",
+  "OCD",
+  "PTSD",
+  "Sensory processing disorder",
+  "Speech impairment",
+  "Tourette syndrome",
+  "Wheelchair user",
+  "Unfair policy / blanket rule",
+  "Other",
 ];
 
 const COUNTRIES = [
@@ -29,6 +59,8 @@ const COUNTRIES = [
 export default function OnboardingScreen({ onComplete, onBack }: OnboardingScreenProps) {
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
+  const [selectedAdjustments, setSelectedAdjustments] = useState<string[]>([]);
+  const [customAdjustment, setCustomAdjustment] = useState("");
   const [profile, setProfile] = useState<UserProfile>({
     fullName: "",
     adjustment: "",
@@ -136,31 +168,39 @@ export default function OnboardingScreen({ onComplete, onBack }: OnboardingScree
                 <Label className="text-lg font-medium">
                   What's the issue or adjustment you need? <span className="text-muted-foreground font-normal">(optional)</span>
                 </Label>
-                <div className="flex flex-wrap gap-2">
-                  {SCENARIO_CHIPS.map((chip) => (
-                    <button
-                      key={chip}
-                      type="button"
-                      onClick={() => setProfile({ ...profile, adjustment: chip.toLowerCase() })}
-                      className={`px-3 py-1.5 rounded-full text-sm border transition-colors ${
-                        profile.adjustment === chip.toLowerCase()
-                          ? "bg-accent text-accent-foreground border-accent"
-                          : "bg-background text-muted-foreground border-border hover:border-accent/50"
-                      }`}
+                <div className="max-h-52 overflow-y-auto space-y-1 border rounded-lg p-3 bg-card">
+                  {ADJUSTMENT_OPTIONS.map((option) => (
+                    <label
+                      key={option}
+                      className="flex items-center gap-3 py-1.5 px-2 rounded-md hover:bg-muted/50 cursor-pointer transition-colors"
                     >
-                      {chip}
-                    </button>
+                      <Checkbox
+                        checked={selectedAdjustments.includes(option)}
+                        onCheckedChange={(checked) => {
+                          const updated = checked
+                            ? [...selectedAdjustments, option]
+                            : selectedAdjustments.filter((a) => a !== option);
+                          setSelectedAdjustments(updated);
+                          const combined = [...updated, customAdjustment].filter(Boolean).join(", ");
+                          setProfile({ ...profile, adjustment: combined });
+                        }}
+                      />
+                      <span className="text-sm text-foreground">{option}</span>
+                    </label>
                   ))}
                 </div>
                 <Input
-                  value={profile.adjustment}
-                  onChange={(e) => setProfile({ ...profile, adjustment: e.target.value })}
-                  placeholder="e.g. hearing loss, dyslexia, anxiety, unfair treatment"
-                  className="h-14 text-base"
-                  autoFocus
+                  value={customAdjustment}
+                  onChange={(e) => {
+                    setCustomAdjustment(e.target.value);
+                    const combined = [...selectedAdjustments, e.target.value].filter(Boolean).join(", ");
+                    setProfile({ ...profile, adjustment: combined });
+                  }}
+                  placeholder="Or type your own..."
+                  className="h-12 text-base"
                 />
                 <p className="text-sm text-muted-foreground">
-                  This can be a disability, a reasonable adjustment need, or any situation where you feel a blanket policy is being applied without considering your individual circumstances.
+                  Select all that apply, or type your own. This helps us tailor the conversation to your situation.
                 </p>
               </div>
             )}
