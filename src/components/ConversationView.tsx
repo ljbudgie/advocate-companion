@@ -5,10 +5,11 @@ import type { Message } from "@/types/burgess";
 import type { SavedConversation } from "@/hooks/useConversationStorage";
 import StaffDisplay from "./StaffDisplay";
 import { supabase } from "@/integrations/supabase/client";
-import { Shield, Maximize2, Copy, Mail, Send, Sparkles, RotateCcw, Info } from "lucide-react";
+import { Shield, Maximize2, Copy, Mail, Send, Sparkles, RotateCcw, Info, Download } from "lucide-react";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
 import { useNavigate } from "react-router-dom";
+import { downloadLogPDF } from "@/lib/generateLogPDF";
 
 interface ConversationViewProps {
   conversation: SavedConversation;
@@ -150,6 +151,9 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
             </Button>
             <Button variant="ghost" size="icon" onClick={emailLog} title="Email log">
               <Mail className="w-4 h-4" />
+            </Button>
+            <Button variant="ghost" size="icon" onClick={() => downloadLogPDF({ ...conversation, messages })} title="Download PDF">
+              <Download className="w-4 h-4" />
             </Button>
             <Button variant="ghost" size="icon" onClick={onReset} title="Start over">
               <RotateCcw className="w-4 h-4" />
