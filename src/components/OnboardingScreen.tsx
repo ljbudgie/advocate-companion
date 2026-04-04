@@ -59,6 +59,8 @@ const COUNTRIES = [
 export default function OnboardingScreen({ onComplete, onBack }: OnboardingScreenProps) {
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
+  const [selectedAdjustments, setSelectedAdjustments] = useState<string[]>([]);
+  const [customAdjustment, setCustomAdjustment] = useState("");
   const [profile, setProfile] = useState<UserProfile>({
     fullName: "",
     adjustment: "",
