@@ -156,7 +156,7 @@ export default function ConversationView({ profile, onReset }: ConversationViewP
                     <span>AI adjustment</span>
                   </div>
                 )}
-                <p className="whitespace-pre-wrap">{msg.content}</p>
+                <div className="prose prose-sm max-w-none prose-p:my-1 prose-headings:my-2 prose-strong:text-inherit"><ReactMarkdown>{msg.content}</ReactMarkdown></div>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-xs text-muted-foreground">{msg.timestamp.toLocaleTimeString()}</span>
