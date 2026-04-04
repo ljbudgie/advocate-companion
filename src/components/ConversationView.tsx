@@ -21,7 +21,10 @@ function generateOpeningMessage(profile: UserProfile): string {
   else if (country === "Canada") legal = "duty to accommodate under Canadian human rights law";
   else if (country === "Australia") legal = "reasonable adjustments under the Disability Discrimination Act";
 
-  return `Hello, my name is ${fullName}. I have ${adjustment}, and I would like to discuss ${legal} that may apply to my situation. Could I please have your name and role so we can proceed?`;
+  if (adjustment.trim()) {
+    return `Hello, my name is ${fullName}. I have ${adjustment}, and I would like to discuss ${legal} that may apply to my situation. Could I please have your name and role so we can proceed?`;
+  }
+  return `Hello, my name is ${fullName}. I believe a blanket policy is being applied to my situation without individual consideration. I would like to discuss ${legal} that may apply. Could I please have your name and role so we can proceed?`;
 }
 
 export default function ConversationView({ profile, onReset }: ConversationViewProps) {
