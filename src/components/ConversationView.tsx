@@ -124,6 +124,9 @@ export default function ConversationView({ profile, onReset }: ConversationViewP
             <span className="font-serif font-semibold text-foreground">Burgess Principle</span>
           </div>
           <div className="flex gap-1">
+            <Button variant="ghost" size="icon" onClick={() => navigate("/about")} title="About">
+              <Info className="w-4 h-4" />
+            </Button>
             <Button variant="ghost" size="icon" onClick={copyLog} title="Copy log">
               <Copy className="w-4 h-4" />
             </Button>
