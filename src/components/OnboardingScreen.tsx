@@ -12,11 +12,40 @@ interface OnboardingScreenProps {
   onBack?: () => void;
 }
 
-const SCENARIO_CHIPS = [
-  "Disability adjustment",
-  "Hidden disability",
-  "Unfair policy",
-  "Customer complaint",
+const ADJUSTMENT_OPTIONS = [
+  "ADHD",
+  "Anxiety",
+  "Autism / ASD",
+  "Bipolar disorder",
+  "Blind / visual impairment",
+  "Chronic fatigue / ME",
+  "Chronic pain",
+  "Coeliac disease",
+  "Crohn's disease / IBD",
+  "Deaf / hearing impairment",
+  "Depression",
+  "Diabetes",
+  "Down syndrome",
+  "Dyslexia",
+  "Dyspraxia",
+  "Ehlers-Danlos syndrome",
+  "Epilepsy",
+  "Fibromyalgia",
+  "Heart condition",
+  "Hypermobility",
+  "Learning disability",
+  "Lupus",
+  "Mental health condition",
+  "Mobility impairment",
+  "Multiple sclerosis",
+  "OCD",
+  "PTSD",
+  "Sensory processing disorder",
+  "Speech impairment",
+  "Tourette syndrome",
+  "Wheelchair user",
+  "Unfair policy / blanket rule",
+  "Other",
 ];
 
 const COUNTRIES = [
