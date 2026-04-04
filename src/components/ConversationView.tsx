@@ -1,7 +1,8 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import type { UserProfile, Message } from "@/types/burgess";
+import type { Message } from "@/types/burgess";
+import type { SavedConversation } from "@/hooks/useConversationStorage";
 import StaffDisplay from "./StaffDisplay";
 import { supabase } from "@/integrations/supabase/client";
 import { Shield, Maximize2, Copy, Mail, Send, Sparkles, RotateCcw, Info } from "lucide-react";
@@ -10,11 +11,12 @@ import ReactMarkdown from "react-markdown";
 import { useNavigate } from "react-router-dom";
 
 interface ConversationViewProps {
-  profile: UserProfile;
+  conversation: SavedConversation;
+  onSave: (conv: SavedConversation) => void;
   onReset: () => void;
 }
 
-function generateOpeningMessage(profile: UserProfile): string {
+function generateOpeningMessage(profile: SavedConversation["profile"]): string {
   const { fullName, adjustment, country } = profile;
   let legal = "reasonable adjustments";
   if (country === "United States") legal = "reasonable accommodations under the ADA";
@@ -28,10 +30,11 @@ function generateOpeningMessage(profile: UserProfile): string {
   return `Hello, my name is ${fullName}. I believe a blanket policy is being applied to my situation without individual consideration. I would like to discuss ${legal} that may apply. Could I please have your name and role so we can proceed?`;
 }
 
-export default function ConversationView({ profile, onReset }: ConversationViewProps) {
+export default function ConversationView({ conversation, onSave, onReset }: ConversationViewProps) {
   const navigate = useNavigate();
   const [messages, setMessages] = useState<Message[]>(() => {
-    const opening = generateOpeningMessage(profile);
+    if (conversation.messages.length > 0) return conversation.messages;
+    const opening = generateOpeningMessage(conversation.profile);
     return [{
       id: crypto.randomUUID(),
       role: "staff-display",
@@ -45,9 +48,25 @@ export default function ConversationView({ profile, onReset }: ConversationViewP
   const [showStaff, setShowStaff] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  // Auto-save when messages change
+  const saveTimeout = useRef<ReturnType<typeof setTimeout>>();
+  useEffect(() => {
+    clearTimeout(saveTimeout.current);
+    saveTimeout.current = setTimeout(() => {
+      onSave({
+        ...conversation,
+        messages,
+        updatedAt: new Date().toISOString(),
+      });
+    }, 500);
+    return () => clearTimeout(saveTimeout.current);
+  }, [messages]);
+
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages]);
+
+  const profile = conversation.profile;
 
   const callAI = async (systemContext: string, userMessage: string): Promise<string> => {
     const resp = await supabase.functions.invoke("burgess-copilot", {
@@ -117,7 +136,6 @@ export default function ConversationView({ profile, onReset }: ConversationViewP
       {showStaff && <StaffDisplay content={showStaff} onClose={() => setShowStaff(null)} />}
 
       <div className="min-h-screen flex flex-col bg-background">
-        {/* Header */}
         <header className="border-b bg-card px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Shield className="w-5 h-5 text-accent" />
@@ -139,7 +157,6 @@ export default function ConversationView({ profile, onReset }: ConversationViewP
           </div>
         </header>
 
-        {/* Messages */}
         <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4">
           {messages.map((msg) => (
             <div key={msg.id} className={`space-y-1 ${msg.role === "user" ? "ml-8" : "mr-4"}`}>
@@ -189,7 +206,6 @@ export default function ConversationView({ profile, onReset }: ConversationViewP
           )}
         </div>
 
-        {/* Input area */}
         <div className="border-t bg-card p-4 space-y-3">
           <div className="space-y-2">
             <label className="text-sm font-medium text-foreground">What did the staff member say?</label>
