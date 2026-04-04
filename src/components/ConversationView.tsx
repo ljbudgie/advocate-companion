@@ -1,12 +1,12 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import type { UserProfile, Message } from "@/types/burgess";
 import StaffDisplay from "./StaffDisplay";
 import { supabase } from "@/integrations/supabase/client";
 import { Shield, Maximize2, Copy, Mail, Send, Sparkles, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
+import ReactMarkdown from "react-markdown";
 
 interface ConversationViewProps {
   profile: UserProfile;
@@ -156,7 +156,7 @@ export default function ConversationView({ profile, onReset }: ConversationViewP
                     <span>AI adjustment</span>
                   </div>
                 )}
-                <p className="whitespace-pre-wrap">{msg.content}</p>
+                <div className="prose prose-sm max-w-none prose-p:my-1 prose-headings:my-2 prose-strong:text-inherit"><ReactMarkdown>{msg.content}</ReactMarkdown></div>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-xs text-muted-foreground">{msg.timestamp.toLocaleTimeString()}</span>
