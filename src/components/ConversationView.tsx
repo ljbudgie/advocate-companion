@@ -51,13 +51,15 @@ function generateOpeningMessage(profile: SavedConversation["profile"]): string {
 export default function ConversationView({ conversation, onSave, onReset }: ConversationViewProps) {
   const navigate = useNavigate();
   const isFirstConversation = conversation.messages.length === 0;
+  const [openingMessage] = useState(() =>
+    isFirstConversation ? generateOpeningMessage(conversation.profile) : null
+  );
   const [messages, setMessages] = useState<Message[]>(() => {
     if (conversation.messages.length > 0) return conversation.messages;
-    const opening = generateOpeningMessage(conversation.profile);
     return [{
       id: crypto.randomUUID(),
       role: "staff-display",
-      content: opening,
+      content: openingMessage!,
       timestamp: new Date(),
     }];
   });
@@ -66,7 +68,7 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
   const [isLoading, setIsLoading] = useState(false);
   const [showStaff, setShowStaff] = useState<string | null>(
     // Auto-show the first message in staff display for new conversations
-    isFirstConversation ? generateOpeningMessage(conversation.profile) : null
+    openingMessage
   );
   const [showHints, setShowHints] = useState(isFirstConversation);
   const [showResetConfirm, setShowResetConfirm] = useState(false);

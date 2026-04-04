@@ -197,7 +197,7 @@ export default function OnboardingScreen({ onComplete, onBack }: OnboardingScree
             )}
 
             <div className="flex gap-3 pt-2">
-              {step > 0 && (
+              {step > 1 && (
                 <Button variant="outline" onClick={() => setStep(step - 1)} className="h-14 flex-1 text-base">
                   Back
                 </Button>
