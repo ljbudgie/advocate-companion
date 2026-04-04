@@ -97,17 +97,17 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
             {step === 2 && (
               <div className="space-y-4">
                 <Label className="text-lg font-medium">
-                  What disability or reasonable adjustment applies?
+                  What's the issue or adjustment you need? <span className="text-muted-foreground font-normal">(optional)</span>
                 </Label>
                 <Input
                   value={profile.adjustment}
                   onChange={(e) => setProfile({ ...profile, adjustment: e.target.value })}
-                  placeholder="e.g. hearing loss, dyslexia, anxiety"
+                  placeholder="e.g. hearing loss, dyslexia, anxiety, unfair treatment"
                   className="h-14 text-base"
                   autoFocus
                 />
                 <p className="text-sm text-muted-foreground">
-                  This helps us phrase your requests accurately.
+                  This can be a disability, a reasonable adjustment need, or any situation where you feel a blanket policy is being applied without considering your individual circumstances.
                 </p>
               </div>
             )}
