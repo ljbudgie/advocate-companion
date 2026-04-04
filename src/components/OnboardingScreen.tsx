@@ -1,0 +1,165 @@
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import type { UserProfile } from "@/types/burgess";
+import { Shield } from "lucide-react";
+
+interface OnboardingScreenProps {
+  onComplete: (profile: UserProfile) => void;
+}
+
+const COUNTRIES = [
+  "United Kingdom", "United States", "Canada", "Australia", "Ireland",
+  "New Zealand", "South Africa", "India", "Germany", "France",
+  "Netherlands", "Sweden", "Norway", "Denmark", "Finland",
+  "Spain", "Italy", "Japan", "South Korea", "Brazil", "Other"
+];
+
+export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
+  const [step, setStep] = useState(0);
+  const [profile, setProfile] = useState<UserProfile>({
+    fullName: "",
+    adjustment: "",
+    country: "",
+    context: "",
+  });
+
+  const canProceed = () => {
+    if (step === 1) return profile.fullName.trim().length > 0;
+    if (step === 2) return profile.adjustment.trim().length > 0;
+    if (step === 3) return profile.country.trim().length > 0;
+    return true;
+  };
+
+  const handleNext = () => {
+    if (step < 4) setStep(step + 1);
+    else onComplete(profile);
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      <div className="w-full max-w-md">
+        {step === 0 && (
+          <div className="text-center space-y-8 animate-in fade-in duration-700">
+            <div className="mx-auto w-16 h-16 rounded-2xl bg-primary flex items-center justify-center">
+              <Shield className="w-8 h-8 text-primary-foreground" />
+            </div>
+            <div className="space-y-3">
+              <h1 className="text-2xl font-serif font-bold text-foreground">
+                The Burgess Principle
+              </h1>
+              <p className="text-base text-muted-foreground leading-relaxed">
+                Your companion for asserting reasonable adjustments.
+              </p>
+            </div>
+            <div className="bg-card rounded-xl border p-6 text-left space-y-3">
+              <p className="text-foreground text-base leading-relaxed">
+                Hi. Before we proceed, can I ask you a few questions to produce maximum results?
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Your information stays on your device and is never stored.
+              </p>
+            </div>
+            <Button onClick={handleNext} size="lg" className="w-full text-base h-14">
+              Let's begin
+            </Button>
+          </div>
+        )}
+
+        {step >= 1 && step <= 4 && (
+          <div className="space-y-6 animate-in fade-in duration-500">
+            <div className="flex items-center gap-2 mb-2">
+              {[1, 2, 3, 4].map((s) => (
+                <div
+                  key={s}
+                  className={`h-1.5 flex-1 rounded-full transition-colors ${
+                    s <= step ? "bg-accent" : "bg-muted"
+                  }`}
+                />
+              ))}
+            </div>
+
+            {step === 1 && (
+              <div className="space-y-4">
+                <Label className="text-lg font-medium">What is your full name?</Label>
+                <Input
+                  value={profile.fullName}
+                  onChange={(e) => setProfile({ ...profile, fullName: e.target.value })}
+                  placeholder="e.g. Alex Johnson"
+                  className="h-14 text-base"
+                  autoFocus
+                />
+              </div>
+            )}
+
+            {step === 2 && (
+              <div className="space-y-4">
+                <Label className="text-lg font-medium">
+                  What disability or reasonable adjustment applies?
+                </Label>
+                <Input
+                  value={profile.adjustment}
+                  onChange={(e) => setProfile({ ...profile, adjustment: e.target.value })}
+                  placeholder="e.g. hearing loss, dyslexia, anxiety"
+                  className="h-14 text-base"
+                  autoFocus
+                />
+                <p className="text-sm text-muted-foreground">
+                  This helps us phrase your requests accurately.
+                </p>
+              </div>
+            )}
+
+            {step === 3 && (
+              <div className="space-y-4">
+                <Label className="text-lg font-medium">Which country are you in?</Label>
+                <select
+                  value={profile.country}
+                  onChange={(e) => setProfile({ ...profile, country: e.target.value })}
+                  className="w-full h-14 text-base rounded-lg border bg-background px-3 text-foreground"
+                >
+                  <option value="">Select your country</option>
+                  {COUNTRIES.map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {step === 4 && (
+              <div className="space-y-4">
+                <Label className="text-lg font-medium">
+                  Any context about your situation? <span className="text-muted-foreground font-normal">(optional)</span>
+                </Label>
+                <Textarea
+                  value={profile.context}
+                  onChange={(e) => setProfile({ ...profile, context: e.target.value })}
+                  placeholder="e.g. I'm at a bank and they won't provide a sign language interpreter for my appointment..."
+                  className="min-h-[120px] text-base"
+                  autoFocus
+                />
+              </div>
+            )}
+
+            <div className="flex gap-3 pt-2">
+              {step > 1 && (
+                <Button variant="outline" onClick={() => setStep(step - 1)} className="h-14 flex-1 text-base">
+                  Back
+                </Button>
+              )}
+              <Button
+                onClick={handleNext}
+                disabled={!canProceed()}
+                className="h-14 flex-1 text-base"
+              >
+                {step === 4 ? "Generate opening message" : "Continue"}
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
