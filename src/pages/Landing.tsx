@@ -400,7 +400,7 @@ export default function Landing() {
             </li>
             <li className="flex items-start gap-2">
               <span className="text-accent mt-0.5" aria-hidden="true">✓</span>
-              <span>High contrast colour scheme with dark mode support</span>
+              <span>Colour scheme designed for readability with dark mode support</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-accent mt-0.5" aria-hidden="true">✓</span>
