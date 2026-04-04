@@ -152,6 +152,9 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
             <Button variant="ghost" size="icon" onClick={emailLog} title="Email log">
               <Mail className="w-4 h-4" />
             </Button>
+            <Button variant="ghost" size="icon" onClick={() => downloadLogPDF({ ...conversation, messages })} title="Download PDF">
+              <Download className="w-4 h-4" />
+            </Button>
             <Button variant="ghost" size="icon" onClick={onReset} title="Start over">
               <RotateCcw className="w-4 h-4" />
             </Button>
