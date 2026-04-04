@@ -4,9 +4,10 @@ import { Input } from "@/components/ui/input";
 import type { UserProfile, Message } from "@/types/burgess";
 import StaffDisplay from "./StaffDisplay";
 import { supabase } from "@/integrations/supabase/client";
-import { Shield, Maximize2, Copy, Mail, Send, Sparkles, RotateCcw } from "lucide-react";
+import { Shield, Maximize2, Copy, Mail, Send, Sparkles, RotateCcw, Info } from "lucide-react";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
+import { useNavigate } from "react-router-dom";
 
 interface ConversationViewProps {
   profile: UserProfile;
@@ -28,6 +29,7 @@ function generateOpeningMessage(profile: UserProfile): string {
 }
 
 export default function ConversationView({ profile, onReset }: ConversationViewProps) {
+  const navigate = useNavigate();
   const [messages, setMessages] = useState<Message[]>(() => {
     const opening = generateOpeningMessage(profile);
     return [{
@@ -122,6 +124,9 @@ export default function ConversationView({ profile, onReset }: ConversationViewP
             <span className="font-serif font-semibold text-foreground">Burgess Principle</span>
           </div>
           <div className="flex gap-1">
+            <Button variant="ghost" size="icon" onClick={() => navigate("/about")} title="About">
+              <Info className="w-4 h-4" />
+            </Button>
             <Button variant="ghost" size="icon" onClick={copyLog} title="Copy log">
               <Copy className="w-4 h-4" />
             </Button>

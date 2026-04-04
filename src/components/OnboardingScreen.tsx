@@ -4,7 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import type { UserProfile } from "@/types/burgess";
-import { Shield } from "lucide-react";
+import { Shield, Info } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface OnboardingScreenProps {
   onComplete: (profile: UserProfile) => void;
@@ -18,6 +19,7 @@ const COUNTRIES = [
 ];
 
 export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
+  const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [profile, setProfile] = useState<UserProfile>({
     fullName: "",
@@ -65,6 +67,12 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
             <Button onClick={handleNext} size="lg" className="w-full text-base h-14">
               Let's begin
             </Button>
+            <button
+              onClick={() => navigate("/about")}
+              className="flex items-center justify-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mx-auto"
+            >
+              <Info className="w-3.5 h-3.5" /> What is the Burgess Principle?
+            </button>
           </div>
         )}
 
