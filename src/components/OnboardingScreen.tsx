@@ -4,7 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import type { UserProfile } from "@/types/burgess";
-import { Shield } from "lucide-react";
+import { Shield, Info } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface OnboardingScreenProps {
   onComplete: (profile: UserProfile) => void;
