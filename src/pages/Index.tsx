@@ -33,25 +33,29 @@ export default function Index() {
   };
 
   if (showOnboarding || (!activeConv && conversations.length === 0)) {
-    return <OnboardingScreen onComplete={handleNewProfile} onBack={conversations.length > 0 ? () => setShowOnboarding(false) : undefined} />;
+    return <div id="main-content"><OnboardingScreen onComplete={handleNewProfile} onBack={conversations.length > 0 ? () => setShowOnboarding(false) : undefined} /></div>;
   }
 
   if (activeConv) {
     return (
-      <ConversationView
-        conversation={activeConv}
-        onSave={handleSave}
-        onReset={handleReset}
-      />
+      <div id="main-content">
+        <ConversationView
+          conversation={activeConv}
+          onSave={handleSave}
+          onReset={handleReset}
+        />
+      </div>
     );
   }
 
   return (
-    <ConversationHistory
-      conversations={conversations}
-      onResume={(conv) => setActiveConv(conv)}
-      onNew={() => setShowOnboarding(true)}
-      onDelete={remove}
-    />
+    <div id="main-content">
+      <ConversationHistory
+        conversations={conversations}
+        onResume={(conv) => setActiveConv(conv)}
+        onNew={() => setShowOnboarding(true)}
+        onDelete={remove}
+      />
+    </div>
   );
 }

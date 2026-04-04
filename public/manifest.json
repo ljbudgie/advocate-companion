@@ -1,0 +1,17 @@
+{
+  "name": "The Burgess Principle — Reasonable Adjustment Companion",
+  "short_name": "Burgess Principle",
+  "description": "Free AI-powered companion for asserting reasonable adjustments. Helps anyone with hidden disabilities navigate their rights across 21 countries.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f5f3ef",
+  "theme_color": "#3b82f6",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ],
+  "categories": ["utilities", "accessibility", "health"]
+}
