@@ -1,5 +1,8 @@
 # The Burgess Principle — Reasonable Adjustment Companion
 
+> ⚠️ **Important**  
+> This is a personal self-advocacy tool grounded in The Burgess Principle. The generated messages and templates are for informational and assistive purposes only. They do not constitute legal advice. Laws and their application vary by individual circumstances and jurisdiction. Always review outputs carefully and consult a qualified professional where needed.
+
 This project is licensed under the MIT License with additional terms for "The Burgess Principle" content. See the [LICENSE](LICENSE) file for full details.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
