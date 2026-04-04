@@ -5,11 +5,28 @@ import type { Message } from "@/types/burgess";
 import type { SavedConversation } from "@/hooks/useConversationStorage";
 import StaffDisplay from "./StaffDisplay";
 import { supabase } from "@/integrations/supabase/client";
-import { Shield, Maximize2, Copy, Mail, Send, Sparkles, RotateCcw, Info, Download } from "lucide-react";
+import { Shield, Maximize2, Copy, Mail, Send, Sparkles, RotateCcw, Info, Download, MoreVertical, X } from "lucide-react";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
 import { useNavigate } from "react-router-dom";
 import { downloadLogPDF } from "@/lib/generateLogPDF";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 
 interface ConversationViewProps {
   conversation: SavedConversation;
@@ -33,20 +50,28 @@ function generateOpeningMessage(profile: SavedConversation["profile"]): string {
 
 export default function ConversationView({ conversation, onSave, onReset }: ConversationViewProps) {
   const navigate = useNavigate();
+  const isFirstConversation = conversation.messages.length === 0;
+  const [openingMessage] = useState(() =>
+    isFirstConversation ? generateOpeningMessage(conversation.profile) : null
+  );
   const [messages, setMessages] = useState<Message[]>(() => {
     if (conversation.messages.length > 0) return conversation.messages;
-    const opening = generateOpeningMessage(conversation.profile);
     return [{
       id: crypto.randomUUID(),
       role: "staff-display",
-      content: opening,
+      content: openingMessage!,
       timestamp: new Date(),
     }];
   });
   const [staffReply, setStaffReply] = useState("");
   const [aiHelper, setAiHelper] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [showStaff, setShowStaff] = useState<string | null>(null);
+  const [showStaff, setShowStaff] = useState<string | null>(
+    // Auto-show the first message in staff display for new conversations
+    openingMessage
+  );
+  const [showHints, setShowHints] = useState(isFirstConversation);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Auto-save when messages change
@@ -136,6 +161,21 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
     <>
       {showStaff && <StaffDisplay content={showStaff} onClose={() => setShowStaff(null)} />}
 
+      <AlertDialog open={showResetConfirm} onOpenChange={setShowResetConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Start over?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to start a new conversation? Your current conversation will still be saved in your history.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={onReset}>Start over</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <div className="min-h-screen flex flex-col bg-background">
         <header className="border-b bg-card px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -146,22 +186,43 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
             <Button variant="ghost" size="icon" onClick={() => navigate("/about")} title="About">
               <Info className="w-4 h-4" />
             </Button>
-            <Button variant="ghost" size="icon" onClick={copyLog} title="Copy log">
-              <Copy className="w-4 h-4" />
-            </Button>
-            <Button variant="ghost" size="icon" onClick={emailLog} title="Email log">
-              <Mail className="w-4 h-4" />
-            </Button>
-            <Button variant="ghost" size="icon" onClick={() => downloadLogPDF({ ...conversation, messages })} title="Download PDF">
-              <Download className="w-4 h-4" />
-            </Button>
-            <Button variant="ghost" size="icon" onClick={onReset} title="Start over">
-              <RotateCcw className="w-4 h-4" />
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" title="More options">
+                  <MoreVertical className="w-4 h-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={copyLog}>
+                  <Copy className="w-4 h-4 mr-2" /> Copy log
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={emailLog}>
+                  <Mail className="w-4 h-4 mr-2" /> Email log
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => downloadLogPDF({ ...conversation, messages })}>
+                  <Download className="w-4 h-4 mr-2" /> Download PDF
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => setShowResetConfirm(true)} className="text-destructive focus:text-destructive">
+                  <RotateCcw className="w-4 h-4 mr-2" /> Start over
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </header>
 
         <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4">
+          {showHints && (
+            <div className="bg-accent/10 border border-accent/20 rounded-xl p-4 flex items-start justify-between gap-3 animate-in fade-in duration-500">
+              <div className="space-y-1 text-sm text-foreground">
+                <p className="font-medium">👋 Welcome to your first conversation!</p>
+                <p className="text-muted-foreground">Below is a message generated for you. Tap <strong>"Show to staff"</strong> to display it full-screen on your phone so the staff member can read it.</p>
+              </div>
+              <Button variant="ghost" size="icon" className="shrink-0 -mt-1 -mr-1" onClick={() => setShowHints(false)}>
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+          )}
           {messages.map((msg) => (
             <div key={msg.id} className={`space-y-1 ${msg.role === "user" ? "ml-8" : "mr-4"}`}>
               <div
@@ -226,6 +287,9 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
                 <Send className="w-4 h-4" />
               </Button>
             </div>
+            {showHints && (
+              <p className="text-xs text-muted-foreground">After you show the message, type what the staff member said back to you here.</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -245,6 +309,9 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
                 <Sparkles className="w-4 h-4" />
               </Button>
             </div>
+            {showHints && (
+              <p className="text-xs text-muted-foreground">Use this to adjust the tone — e.g. "make it firmer" or "be more polite".</p>
+            )}
           </div>
         </div>
       </div>

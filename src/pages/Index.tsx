@@ -32,8 +32,8 @@ export default function Index() {
     refresh();
   };
 
-  if (showOnboarding) {
-    return <OnboardingScreen onComplete={handleNewProfile} />;
+  if (showOnboarding || (!activeConv && conversations.length === 0)) {
+    return <OnboardingScreen onComplete={handleNewProfile} onBack={conversations.length > 0 ? () => setShowOnboarding(false) : undefined} />;
   }
 
   if (activeConv) {
