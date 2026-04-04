@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 
 interface StaffDisplayProps {
   content: string;
