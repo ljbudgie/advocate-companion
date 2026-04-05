@@ -6,7 +6,7 @@
 [![Vite](https://img.shields.io/badge/Vite-5.4-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 
-An AI-powered advocacy companion that helps people assert their right to reasonable adjustments. Built on [The Burgess Principle](https://theburgessprinciple.co.uk/), it empowers individuals — especially those with hidden disabilities — to have confident, informed conversations with employers, service providers, and institutions.
+An AI-powered Reasonable Adjustment Companion grounded in The Burgess Principle. It empowers individuals — especially those with hidden disabilities — to have confident, informed conversations with employers, service providers, and institutions. Whether starting a new request or responding to a difficult email you've received, the companion meets you where you are. Connect your Outlook or Hotmail inbox and the AI Co-Pilot will read incoming messages and draft a legally-grounded response — ready for you to review, adjust in tone, and send in your own name.
 
 ---
 
@@ -21,6 +21,9 @@ An AI-powered advocacy companion that helps people assert their right to reasona
 - **Conversation history** ✦ Auto-saved conversations with timestamps and full transcript access
 - **PDF export** ✦ Export conversation logs as formatted PDF documents
 - **Email & clipboard** ✦ Copy messages for email or reference
+- **Outlook & Hotmail integration** ✦ Connect your inbox to receive and respond to emails directly through the companion
+- **Email draft review** ✦ Incoming emails are read by the AI Co-Pilot and a response draft is generated for you to approve before sending
+- **Power Automate bridge** ✦ Lightweight no-code pipeline for prototyping the email workflow without Graph webhook complexity
 - **Privacy-first** ✦ All data stored locally in your browser — no server-side tracking
 
 ---
@@ -66,7 +69,7 @@ The app will be available at `http://localhost:8080`.
 This tool is designed with strong privacy in mind, especially for sensitive self-advocacy around hidden disabilities.
 
 - All your personal context, adjustment details, and conversation history stay **entirely in your browser** using LocalStorage. No user data is ever stored on any server.
-- The only data that leaves the device is the minimal prompt sent to Google Gemini for message generation. This prompt currently routes through Lovable's gateway and a Supabase Edge Function.
+- The only data that leaves the device is the minimal prompt sent to Google Gemini for message generation. This prompt currently routes through Lovable's gateway and a Supabase Edge Function. When email integration is enabled, your Microsoft OAuth token is stored encrypted in Supabase and used solely to read and send mail on your behalf — no email content is retained on any server.
 - No tracking, no analytics, and no accounts are required.
 
 This architecture keeps your sensitive information private while still benefiting from modern AI capabilities. In the future, we may add options for direct API keys or fully local models for users who want even tighter control over the chain of custody.
@@ -84,6 +87,7 @@ This architecture keeps your sensitive information private while still benefitin
 | **State** | TanStack React Query |
 | **Backend** | Supabase Edge Functions (Deno) |
 | **AI** | Google Gemini via Lovable AI Gateway |
+| **Email** | Microsoft Graph API × MSAL × Power Automate |
 | **Storage** | Browser LocalStorage |
 | **Testing** | Vitest × Playwright × Testing Library |
 
@@ -99,14 +103,19 @@ src/
 │   ├── OnboardingScreen.tsx
 │   ├── ConversationView.tsx
 │   ├── ConversationHistory.tsx
-│   └── StaffDisplay.tsx
+│   ├── StaffDisplay.tsx
+│   └── EmailDraftReview.tsx
 ├── hooks/                  # Custom React hooks
+│   └── useMicrosoftAuth.ts
 ├── types/                  # TypeScript type definitions
 ├── integrations/           # Supabase client and types
 └── lib/                    # Utility functions
 supabase/
 └── functions/
-    └── burgess-copilot/    # AI response generation (Edge Function)
+    ├── burgess-copilot/    # AI response generation (Edge Function)
+    ├── mail-ingest/        # Email ingestion via Graph API
+    ├── mail-ingest-simple/ # Simplified email ingestion
+    └── send-mail/          # Send mail on behalf of user
 ```
 
 ---
