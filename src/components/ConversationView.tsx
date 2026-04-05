@@ -232,7 +232,7 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
                 <p className="font-medium">👋 Welcome to your first conversation!</p>
                 <p className="text-muted-foreground">Below is a message generated for you. Tap <strong>"Show to staff"</strong> to display it full-screen on your phone so the staff member can read it.</p>
               </div>
-              <Button variant="ghost" size="icon" className="shrink-0 -mt-1 -mr-1" onClick={() => setShowHints(false)}>
+              <Button variant="ghost" size="icon" className="shrink-0 -mt-1 -mr-1" onClick={() => setShowHints(false)} aria-label="Dismiss hints">
                 <X className="w-4 h-4" />
               </Button>
             </div>
@@ -338,7 +338,7 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
                     onKeyDown={(e) => e.key === "Enter" && handleStaffReply()}
                     disabled={isLoading}
                   />
-                  <Button onClick={handleStaffReply} disabled={isLoading || !staffReply.trim()} className="h-12 px-4">
+                  <Button onClick={handleStaffReply} disabled={isLoading || !staffReply.trim()} className="h-12 px-4" aria-label="Send message">
                     <Send className="w-4 h-4" />
                   </Button>
                 </div>
@@ -360,7 +360,7 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
                     onKeyDown={(e) => e.key === "Enter" && handleAiHelper()}
                     disabled={isLoading}
                   />
-                  <Button variant="outline" onClick={handleAiHelper} disabled={isLoading || !aiHelper.trim()} className="h-10 px-3">
+                  <Button variant="outline" onClick={handleAiHelper} disabled={isLoading || !aiHelper.trim()} className="h-10 px-3" aria-label="Send message">
                     <Sparkles className="w-4 h-4" />
                   </Button>
                 </div>

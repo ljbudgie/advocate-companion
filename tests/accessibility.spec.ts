@@ -5,16 +5,13 @@ const BASE_URL = process.env.BASE_URL ?? "http://localhost:4173";
 
 /**
  * Pre-existing accessibility rules that cannot be fixed without modifying
- * existing component logic or theme files:
+ * existing theme files:
  *
  * - color-contrast: The shadcn/ui theme uses --muted-foreground (#67768b) on
  *   --background (#f9f8f6) which yields a 4.35:1 ratio, just under the 4.5:1
  *   WCAG 2 AA threshold. Fixing requires changing CSS custom properties.
- *
- * - button-name: Several icon-only send buttons in ConversationView do not
- *   carry an aria-label or visible text. Fixing requires editing the component.
  */
-const KNOWN_PREEXISTING_RULES = ["color-contrast", "button-name"];
+const KNOWN_PREEXISTING_RULES = ["color-contrast"];
 
 /**
  * Filter axe results to only serious and critical violations.
