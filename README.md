@@ -153,7 +153,7 @@ For licensing enquiries: [lewisburgess_1987@hotmail.co.uk](mailto:lewisburgess_1
 
 ## ✦ The Burgess Principle
 
-The Reasonable Adjustment Companion is the practical implementation of [The Burgess Principle](https://theburgessprinciple.co.uk/) — the idea that every person deserves individual consideration and reasonable adjustments tailored to their needs (**UK Certification Mark:** #UK00004343685).
+The Reasonable Adjustment Companion is the practical implementation of [The Burgess Principle](https://github.com/ljbudgie/burgess-principle) — the idea that every person deserves individual consideration and reasonable adjustments tailored to their needs (**UK Certification Mark:** #UK00004343685).
 
 The full framework — including legal research, IP licensing, and the commercial toolkit — lives in its dedicated repository:  
 [github.com/ljbudgie/burgess-principle](https://github.com/ljbudgie/burgess-principle)
