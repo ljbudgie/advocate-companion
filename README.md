@@ -174,7 +174,7 @@ This project is licensed under the MIT License with additional terms for "The Bu
 
 ## 🙏 Acknowledgements
 
-- [The Burgess Principle](https://theburgessprinciple.co.uk/) ✦ the foundation behind this project
+- [The Burgess Principle](https://github.com/ljbudgie/burgess-principle) ✦ the foundation behind this project
 - [shadcn/ui](https://ui.shadcn.com/) ✦ beautiful, accessible UI components
 - [Supabase](https://supabase.com/) ✦ open-source backend infrastructure
 - [Lovable](https://lovable.dev/) ✦ AI-powered development platform
