@@ -237,6 +237,7 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
           {messages.map((msg) => (
             <div key={msg.id} className={`space-y-1 ${msg.role === "user" ? "ml-8" : "mr-4"}`}>
               <div
+                data-message-bubble
                 className={`rounded-xl p-4 text-base leading-relaxed ${
                   msg.role === "staff-display"
                     ? "bg-primary text-primary-foreground"

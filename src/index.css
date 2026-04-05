@@ -119,6 +119,6 @@
   font-style: normal;
 }
 
-.reading-mode .rounded-xl.p-4 {
+.reading-mode [data-message-bubble] {
   background-color: #FAFAF7;
 }
