@@ -5,11 +5,12 @@ import type { Message } from "@/types/burgess";
 import type { SavedConversation } from "@/hooks/useConversationStorage";
 import StaffDisplay from "./StaffDisplay";
 import { supabase } from "@/integrations/supabase/client";
-import { Shield, Maximize2, Copy, Mail, Send, Sparkles, RotateCcw, Info, Download, MoreVertical, X } from "lucide-react";
+import { Shield, Maximize2, Copy, Mail, Send, Sparkles, RotateCcw, Info, Download, MoreVertical, X, Glasses } from "lucide-react";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
 import { useNavigate } from "react-router-dom";
 import { downloadLogPDF } from "@/lib/generateLogPDF";
+import { useReadingMode } from "@/hooks/useReadingMode";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -50,6 +51,7 @@ function generateOpeningMessage(profile: SavedConversation["profile"]): string {
 
 export default function ConversationView({ conversation, onSave, onReset }: ConversationViewProps) {
   const navigate = useNavigate();
+  const { enabled: readingMode, toggle: toggleReadingMode } = useReadingMode();
   const isFirstConversation = conversation.messages.length === 0;
   const [openingMessage] = useState(() =>
     isFirstConversation ? generateOpeningMessage(conversation.profile) : null
@@ -183,6 +185,15 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
             <span className="font-serif font-semibold text-foreground">Burgess Principle</span>
           </div>
           <div className="flex gap-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleReadingMode}
+              aria-pressed={readingMode}
+              title="Reading mode"
+            >
+              <Glasses className="w-4 h-4" />
+            </Button>
             <Button variant="ghost" size="icon" onClick={() => navigate("/about")} title="About">
               <Info className="w-4 h-4" />
             </Button>
@@ -226,6 +237,7 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
           {messages.map((msg) => (
             <div key={msg.id} className={`space-y-1 ${msg.role === "user" ? "ml-8" : "mr-4"}`}>
               <div
+                data-message-bubble
                 className={`rounded-xl p-4 text-base leading-relaxed ${
                   msg.role === "staff-display"
                     ? "bg-primary text-primary-foreground"

@@ -104,3 +104,21 @@
     color: hsl(var(--staff-foreground));
   }
 }
+
+/* Dyslexia-friendly reading mode */
+.reading-mode {
+  font-size: 115%;
+  line-height: 2.1;
+  letter-spacing: 0.04em;
+  word-spacing: 0.12em;
+}
+
+.reading-mode em,
+.reading-mode i,
+.reading-mode .italic {
+  font-style: normal;
+}
+
+.reading-mode [data-message-bubble] {
+  background-color: #FAFAF7;
+}
