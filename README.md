@@ -25,6 +25,9 @@ An AI-powered Reasonable Adjustment Companion grounded in The Burgess Principle.
 - **Email draft review** ✦ Incoming emails are read by the AI Co-Pilot and a response draft is generated for you to approve before sending
 - **Power Automate bridge** ✦ Lightweight no-code pipeline for prototyping the email workflow without Graph webhook complexity
 - **Privacy-first** ✦ All data stored locally in your browser — no server-side tracking
+- **Response journal** ✦ Every message you send is saved locally with timestamps, searchable, and exportable as PDF — a personal record of every adjustment you've ever requested
+- **Follow-up threads** ✦ Log how each request was received (agreed, refused, ignored) and the AI generates your legally-grounded next step automatically
+- **Offline mode** ✦ Works without internet — curated templates grounded in The Burgess Principle are always available when the AI Co-Pilot can't connect
 
 ---
 
@@ -104,12 +107,19 @@ src/
 │   ├── ConversationView.tsx
 │   ├── ConversationHistory.tsx
 │   ├── StaffDisplay.tsx
-│   └── EmailDraftReview.tsx
+│   ├── EmailDraftReview.tsx
+│   ├── JournalView.tsx
+│   └── JournalThread.tsx
 ├── hooks/                  # Custom React hooks
-│   └── useMicrosoftAuth.ts
+│   ├── useMicrosoftAuth.ts
+│   ├── useReadingMode.ts
+│   ├── useJournal.ts
+│   └── useOnlineStatus.ts
 ├── types/                  # TypeScript type definitions
+│   └── journal.ts
 ├── integrations/           # Supabase client and types
 └── lib/                    # Utility functions
+    └── offlineTemplates.ts
 supabase/
 └── functions/
     ├── burgess-copilot/    # AI response generation (Edge Function)
