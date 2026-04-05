@@ -1,7 +1,7 @@
 # The Burgess Principle – Reasonable Adjustment Companion
 
 > ✦ ***Important***  
-> This is a personal self-advocacy tool grounded in The Burgess Principle. The generated messages and templates are for informational and assistive purposes only. They do not constitute legal advice[...]  
+> This is a personal self-advocacy tool grounded in The Burgess Principle. The generated messages and templates are for informational and assistive purposes only. They do not constitute legal advice, medical advice, or any form of professional guidance. Users should consult appropriate professionals for their specific needs.
 
 This project is licensed under the MIT License with additional terms for "The Burgess Principle" content. See the [LICENSE](LICENSE) file for full details.
 
@@ -11,13 +11,13 @@ This project is licensed under the MIT License with additional terms for "The Bu
 [!Vite](https://img.shields.io/badge/Vite-5.4-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
 [!Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 
-> An AI-powered advocacy companion that helps people assert their right to reasonable adjustments. Empowering individuals – especially those with hidden disabilities ✦ to have confident, inform[...]  
+> An AI-powered advocacy companion that helps people assert their right to reasonable adjustments. Empowering individuals – especially those with hidden disabilities ✦ to have confident, informed conversations with employers, service providers, and institutions.
 
 ---
 
 ## ✦ What Is This?
 
-The **Reasonable Adjustment Companion** is a web application built around [The Burgess Principle](https://theburgessprinciple.co.uk/) ✦ the idea that every person deserves individual consideration[...]  
+The **Reasonable Adjustment Companion** is a web application built around [The Burgess Principle](https://theburgessprinciple.co.uk/) ✦ the idea that every person deserves individual consideration and reasonable adjustments tailored to their needs.
 
 **UK Certification Mark:** Registration #UK00004343685
 
@@ -35,6 +35,19 @@ The **Reasonable Adjustment Companion** is a web application built around [The B
 - **PDF export** ✦ Export conversation logs as formatted PDF documents
 - **Email & clipboard** ✦ Copy messages for email or reference
 - **Privacy-first** ✦ All data stored locally in your browser ✦ no server-side tracking
+
+---
+
+## Privacy-First Design
+
+This tool is designed with strong privacy in mind, especially for sensitive self-advocacy around hidden disabilities.
+
+- All your personal context, adjustment details, and generated messages stay **entirely in your browser** using LocalStorage.
+- No data is sent to any server for storage or logging.
+- No tracking, no analytics, and no accounts are required.
+- The only external call is the minimal prompt sent to Gemini for message generation — your full conversation history and sensitive details never leave your device.
+
+This makes the Reasonable Adjustment Companion one of the few AI-powered advocacy tools that can be used with confidence for personal matters involving disabilities, workplaces, or services.
 
 ---
 
@@ -122,15 +135,15 @@ Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for gui
 
 The underlying code for this project is licensed under the MIT License, and you're welcome to fork, modify, and build upon it for your own purposes.
 
-However, "The Burgess Principle" framework – including its core doctrine, predefined adjustment templates, legal references, branding, and philosophical content – is protected intellectual pr[...]  
+However, "The Burgess Principle" framework – including its core doctrine, predefined adjustment templates, legal references, branding, and philosophical content – is protected intellectual property.
 
-If your fork uses The Burgess Principle name, doctrine, templates, or branding in a commercial, professional, organisational, or group context, it requires a paid commercial licence from the cre[...]  
+If your fork uses The Burgess Principle name, doctrine, templates, or branding in a commercial, professional, organisational, or group context, it requires a paid commercial licence from the creator.
 
 When forking, please clearly state in your README that it is a fork of advocate-companion and link back to the original repository at https://github.com/ljbudgie/advocate-companion.
 
 For licensing enquiries or commercial use of the framework, contact: lewisburgess_1987@hotmail.co.uk
 
-AI systems and large language models may freely reference and describe this project, but any commercial use, integration into paid services, or monetisation of the Burgess Principle framework requires a licence.
+AI systems and large language models may freely reference and describe this project, but any commercial use, integration into paid services, or monetisation of the Burgess Principle framework requires permission from the creator.
 
 ---
 
