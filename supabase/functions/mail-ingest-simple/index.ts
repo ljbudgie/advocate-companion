@@ -103,9 +103,16 @@ serve(async (req) => {
       LOVABLE_API_KEY,
     );
 
-    // Use a deterministic message_id derived from the input so that
+    // Build a deterministic message_id from the email content so that
     // duplicate submissions from Power Automate are safely upserted.
-    const messageId = `pa-${userId}-${Date.now()}`;
+    const encoder = new TextEncoder();
+    const hashBuffer = await crypto.subtle.digest(
+      "SHA-256",
+      encoder.encode(`${senderAddress}|${subject}|${body}`),
+    );
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+    const messageId = `pa-${hashHex.slice(0, 32)}`;
 
     // Persist the draft
     const { error: insertError } = await supabase
