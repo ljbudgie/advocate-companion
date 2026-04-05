@@ -61,14 +61,15 @@ The app will be available at `http://localhost:8080`.
 
 ---
 
-## 🔒 Privacy-First Design
+## Privacy-First Design
 
 This tool is designed with strong privacy in mind, especially for sensitive self-advocacy around hidden disabilities.
 
-- All personal context, adjustment details, and generated messages stay **entirely in your browser** using LocalStorage.
-- No data is sent to any server for storage or logging.
-- No tracking, no analytics, and no accounts required.
-- The only external call is the minimal prompt sent to Gemini for message generation — your full conversation history and sensitive details never leave your device.
+- All your personal context, adjustment details, and conversation history stay **entirely in your browser** using LocalStorage. No user data is ever stored on any server.
+- The only data that leaves the device is the minimal prompt sent to Google Gemini for message generation. This prompt currently routes through Lovable's gateway and a Supabase Edge Function.
+- No tracking, no analytics, and no accounts are required.
+
+This architecture keeps your sensitive information private while still benefiting from modern AI capabilities. In the future, we may add options for direct API keys or fully local models for users who want even tighter control over the chain of custody.
 
 ---
 
