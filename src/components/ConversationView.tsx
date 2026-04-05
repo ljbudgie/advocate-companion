@@ -5,12 +5,14 @@ import type { Message } from "@/types/burgess";
 import type { SavedConversation } from "@/hooks/useConversationStorage";
 import StaffDisplay from "./StaffDisplay";
 import { supabase } from "@/integrations/supabase/client";
-import { Shield, Maximize2, Copy, Mail, Send, Sparkles, RotateCcw, Info, Download, MoreVertical, X, Glasses } from "lucide-react";
+import { Shield, Maximize2, Copy, Mail, Send, Sparkles, RotateCcw, Info, Download, MoreVertical, X, Glasses, WifiOff } from "lucide-react";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
 import { useNavigate } from "react-router-dom";
 import { downloadLogPDF } from "@/lib/generateLogPDF";
 import { useReadingMode } from "@/hooks/useReadingMode";
+import { useOnlineStatus } from "@/hooks/useOnlineStatus";
+import { offlineTemplates } from "@/lib/offlineTemplates";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -52,6 +54,7 @@ function generateOpeningMessage(profile: SavedConversation["profile"]): string {
 export default function ConversationView({ conversation, onSave, onReset }: ConversationViewProps) {
   const navigate = useNavigate();
   const { enabled: readingMode, toggle: toggleReadingMode } = useReadingMode();
+  const isOnline = useOnlineStatus();
   const isFirstConversation = conversation.messages.length === 0;
   const [openingMessage] = useState(() =>
     isFirstConversation ? generateOpeningMessage(conversation.profile) : null
@@ -284,47 +287,89 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
         </div>
 
         <div className="border-t bg-card p-4 space-y-3">
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">What did the staff member say?</label>
-            <div className="flex gap-2">
-              <Input
-                value={staffReply}
-                onChange={(e) => setStaffReply(e.target.value)}
-                placeholder="Type or summarise their response..."
-                className="h-12 text-base"
-                onKeyDown={(e) => e.key === "Enter" && handleStaffReply()}
-                disabled={isLoading}
-              />
-              <Button onClick={handleStaffReply} disabled={isLoading || !staffReply.trim()} className="h-12 px-4">
-                <Send className="w-4 h-4" />
-              </Button>
+          {!isOnline ? (
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <WifiOff className="w-4 h-4" />
+                <span>You're offline. Choose a template to get started:</span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {offlineTemplates.map((tpl) => (
+                  <button
+                    key={tpl.title}
+                    className="text-left border rounded-xl p-3 hover:bg-accent/10 transition-colors space-y-1"
+                    onClick={() => setStaffReply(tpl.body)}
+                  >
+                    <p className="font-medium text-sm text-foreground">{tpl.title}</p>
+                    <p className="text-xs text-muted-foreground">{tpl.context}</p>
+                  </button>
+                ))}
+              </div>
+              {staffReply && (
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground">Edit &amp; copy your message</label>
+                  <textarea
+                    className="w-full min-h-[200px] rounded-xl border bg-background p-3 text-sm leading-relaxed focus:outline-none focus:ring-2 focus:ring-accent"
+                    value={staffReply}
+                    onChange={(e) => setStaffReply(e.target.value)}
+                  />
+                  <Button
+                    onClick={() => {
+                      navigator.clipboard.writeText(staffReply);
+                      toast.success("Copied to clipboard");
+                    }}
+                    className="h-10 px-4"
+                  >
+                    <Copy className="w-4 h-4 mr-2" /> Copy message
+                  </Button>
+                </div>
+              )}
             </div>
-            {showHints && (
-              <p className="text-xs text-muted-foreground">After you show the message, type what the staff member said back to you here.</p>
-            )}
-          </div>
+          ) : (
+            <>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">What did the staff member say?</label>
+                <div className="flex gap-2">
+                  <Input
+                    value={staffReply}
+                    onChange={(e) => setStaffReply(e.target.value)}
+                    placeholder="Type or summarise their response..."
+                    className="h-12 text-base"
+                    onKeyDown={(e) => e.key === "Enter" && handleStaffReply()}
+                    disabled={isLoading}
+                  />
+                  <Button onClick={handleStaffReply} disabled={isLoading || !staffReply.trim()} className="h-12 px-4">
+                    <Send className="w-4 h-4" />
+                  </Button>
+                </div>
+                {showHints && (
+                  <p className="text-xs text-muted-foreground">After you show the message, type what the staff member said back to you here.</p>
+                )}
+              </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-accent flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5" /> AI Helper
-            </label>
-            <div className="flex gap-2">
-              <Input
-                value={aiHelper}
-                onChange={(e) => setAiHelper(e.target.value)}
-                placeholder="e.g. make it firmer, more polite, suggest another approach..."
-                className="h-10 text-sm"
-                onKeyDown={(e) => e.key === "Enter" && handleAiHelper()}
-                disabled={isLoading}
-              />
-              <Button variant="outline" onClick={handleAiHelper} disabled={isLoading || !aiHelper.trim()} className="h-10 px-3">
-                <Sparkles className="w-4 h-4" />
-              </Button>
-            </div>
-            {showHints && (
-              <p className="text-xs text-muted-foreground">Use this to adjust the tone — e.g. "make it firmer" or "be more polite".</p>
-            )}
-          </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-accent flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5" /> AI Helper
+                </label>
+                <div className="flex gap-2">
+                  <Input
+                    value={aiHelper}
+                    onChange={(e) => setAiHelper(e.target.value)}
+                    placeholder="e.g. make it firmer, more polite, suggest another approach..."
+                    className="h-10 text-sm"
+                    onKeyDown={(e) => e.key === "Enter" && handleAiHelper()}
+                    disabled={isLoading}
+                  />
+                  <Button variant="outline" onClick={handleAiHelper} disabled={isLoading || !aiHelper.trim()} className="h-10 px-3">
+                    <Sparkles className="w-4 h-4" />
+                  </Button>
+                </div>
+                {showHints && (
+                  <p className="text-xs text-muted-foreground">Use this to adjust the tone — e.g. "make it firmer" or "be more polite".</p>
+                )}
+              </div>
+            </>
+          )}
         </div>
       </div>
     </>
