@@ -104,7 +104,9 @@ serve(async (req) => {
         },
         body: JSON.stringify({
           message: {
-            subject: `Re: ${draft.original_subject}`,
+            subject: draft.original_subject.startsWith("Re:")
+              ? draft.original_subject
+              : `Re: ${draft.original_subject}`,
             body: {
               contentType: "Text",
               content: draft.generated_response,
