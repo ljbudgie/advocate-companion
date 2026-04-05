@@ -105,6 +105,8 @@ serve(async (req) => {
   try {
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    // NOTE: For production, replace this static token with a proper OAuth
+    // refresh-token flow, as Graph access tokens expire after ~1 hour.
     const MS_GRAPH_ACCESS_TOKEN = Deno.env.get("MS_GRAPH_ACCESS_TOKEN");
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 
@@ -162,12 +164,14 @@ serve(async (req) => {
 
       // Persist the draft. Use upsert to avoid duplicate messageId errors
       // if the same notification is delivered more than once.
+      // TODO: Implement proper user mapping (e.g. store user_id in Graph
+      // subscription clientState, or look up user by email address).
       const { error: insertError } = await supabase
         .from("email_drafts")
         .upsert(
           {
             message_id: message.id,
-            user_id: "00000000-0000-0000-0000-000000000000", // placeholder – real user mapping added later
+            user_id: "00000000-0000-0000-0000-000000000000",
             sender_address: senderAddress,
             original_subject: subject,
             original_body: bodyContent,
