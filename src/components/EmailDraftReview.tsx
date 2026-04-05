@@ -11,6 +11,11 @@ type EmailDraft = Tables<"email_drafts">;
 const TONE_OPTIONS = ["formal", "balanced", "firm", "gentle"] as const;
 type Tone = (typeof TONE_OPTIONS)[number];
 
+/** Strip characters that could manipulate an AI prompt. */
+function sanitizeForPrompt(value: string): string {
+  return value.replace(/[{}[\]`\\]/g, "").trim().slice(0, 500);
+}
+
 export default function EmailDraftReview() {
   const [drafts, setDrafts] = useState<EmailDraft[]>([]);
   const [loading, setLoading] = useState(true);
@@ -37,8 +42,9 @@ export default function EmailDraftReview() {
 
       if (error) throw error;
       setDrafts(data ?? []);
-    } catch {
-      toast.error("Failed to load email drafts.");
+    } catch (err) {
+      console.error("Draft fetch error:", err);
+      toast.error("Unable to load drafts. Please check your connection and try again.");
     } finally {
       setLoading(false);
     }
@@ -51,7 +57,9 @@ export default function EmailDraftReview() {
   const handleToneAdjust = async (draft: EmailDraft, tone: Tone) => {
     setAdjustingId(draft.id);
     try {
-      const systemContext = `The user received an email from ${draft.sender_address} with subject "${draft.original_subject}". Rewrite the following Burgess Principle response in a ${tone} tone. Keep it concise and suitable for an email reply.`;
+      const safeSender = sanitizeForPrompt(draft.sender_address);
+      const safeSubject = sanitizeForPrompt(draft.original_subject);
+      const systemContext = `The user received an email from ${safeSender} with subject "${safeSubject}". Rewrite the following Burgess Principle response in a ${tone} tone. Keep it concise and suitable for an email reply.`;
       const resp = await supabase.functions.invoke("burgess-copilot", {
         body: {
           systemContext,
@@ -76,7 +84,8 @@ export default function EmailDraftReview() {
         ),
       );
       toast.success(`Tone adjusted to ${tone}.`);
-    } catch {
+    } catch (err) {
+      console.error("Tone adjustment error:", err);
       toast.error("Failed to adjust tone. Please try again.");
     } finally {
       setAdjustingId(null);
@@ -98,8 +107,9 @@ export default function EmailDraftReview() {
 
       setDrafts((prev) => prev.filter((d) => d.id !== draft.id));
       toast.success("Email sent successfully.");
-    } catch {
-      toast.error("Failed to send email. Please try again.");
+    } catch (err) {
+      console.error("Send error:", err);
+      toast.error("Failed to send email. Check your Microsoft account connection and try again.");
     } finally {
       setSendingId(null);
     }
@@ -115,7 +125,8 @@ export default function EmailDraftReview() {
 
       setDrafts((prev) => prev.filter((d) => d.id !== draft.id));
       toast.success("Draft dismissed.");
-    } catch {
+    } catch (err) {
+      console.error("Dismiss error:", err);
       toast.error("Failed to dismiss draft.");
     }
   };
