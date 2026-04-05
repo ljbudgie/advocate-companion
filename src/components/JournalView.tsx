@@ -21,7 +21,7 @@ import type { SavedConversation } from "@/hooks/useConversationStorage";
 /*  Status pill configuration                                         */
 /* ------------------------------------------------------------------ */
 
-const STATUS_COLOURS: Record<JournalEntry["status"], string> = {
+const STATUS_COLORS: Record<JournalEntry["status"], string> = {
   agreed: "bg-green-600 text-white border-green-600",
   refused: "bg-red-600 text-white border-red-600",
   pending: "bg-amber-500 text-white border-amber-500",
@@ -110,7 +110,7 @@ function ThreadDetail({
             To {entry.recipient} ·{" "}
             {new Date(entry.dateSent).toLocaleDateString()}
           </p>
-          <Badge className={STATUS_COLOURS[entry.status]}>
+          <Badge className={STATUS_COLORS[entry.status]}>
             {entry.status}
           </Badge>
         </div>
@@ -281,7 +281,7 @@ export default function JournalView() {
                     <CardTitle className="text-base font-medium">
                       {entry.title}
                     </CardTitle>
-                    <Badge className={STATUS_COLOURS[entry.status]}>
+                    <Badge className={STATUS_COLORS[entry.status]}>
                       {entry.status}
                     </Badge>
                   </div>
