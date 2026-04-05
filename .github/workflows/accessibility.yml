@@ -1,0 +1,59 @@
+name: Accessibility
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  accessibility:
+    name: Accessibility Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build the app
+        run: npx vite build
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Create Playwright config for accessibility tests
+        run: |
+          cat > playwright.a11y.config.ts << 'PWCONFIG'
+          import { defineConfig } from "@playwright/test";
+          export default defineConfig({
+            testDir: "./tests",
+            retries: 1,
+            use: {
+              baseURL: "http://localhost:4173",
+            },
+            webServer: {
+              command: "npm run preview -- --port 4173",
+              port: 4173,
+              reuseExistingServer: true,
+            },
+          });
+          PWCONFIG
+
+      - name: Run accessibility tests
+        run: npx playwright test --config playwright.a11y.config.ts
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: accessibility-test-results
+          path: test-results/
+          retention-days: 14
