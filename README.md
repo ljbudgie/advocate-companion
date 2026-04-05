@@ -5,6 +5,7 @@
 [![React](https://img.shields.io/badge/React-18.3-61DAFB?logo=react&logoColor=white)](https://react.dev/)
 [![Vite](https://img.shields.io/badge/Vite-5.4-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+<a><img src="https://img.shields.io/badge/Accessibility-Audited-1D9E75?style=flat&logo=accessible-icon&logoColor=white"></a>
 
 An AI-powered Reasonable Adjustment Companion grounded in The Burgess Principle. It empowers individuals — especially those with hidden disabilities — to have confident, informed conversations with employers, service providers, and institutions. Whether starting a new request or responding to a difficult email you've received, the companion meets you where you are. Connect your Outlook or Hotmail inbox and the AI Co-Pilot will read incoming messages and draft a legally-grounded response — ready for you to review, adjust in tone, and send in your own name.
 
