@@ -196,15 +196,7 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
             <span className="font-serif font-semibold text-foreground">Burgess Principle</span>
           </div>
           <div className="flex gap-1">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleReadingMode}
-              aria-pressed={readingMode}
-              title="Reading mode"
-            >
-              <Glasses className="w-4 h-4" />
-            </Button>
+            <AccessibilityPanel />
             <Button variant="ghost" size="icon" onClick={() => navigate("/about")} title="About">
               <Info className="w-4 h-4" />
             </Button>
