@@ -600,6 +600,14 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
 
               <Button
                 variant="outline"
+                className="w-full"
+                onClick={() => downloadMemoryPDF(aiMemory.memory)}
+              >
+                <FileDown className="w-4 h-4 mr-2" />
+                Export as PDF
+              </Button>
+              <Button
+                variant="outline"
                 className="w-full text-destructive hover:text-destructive"
                 onClick={() => {
                   aiMemory.clearMemory();

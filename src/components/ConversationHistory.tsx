@@ -137,18 +137,26 @@ export default function ConversationHistory({ conversations, onResume, onNew, on
                 </div>
               ))}
 
-              <Button
-                variant="outline"
-                className="w-full text-destructive hover:text-destructive"
-                onClick={() => {
-                  aiMemory.clearMemory();
-                  toast.success("AI memory cleared");
-                  setShowMemory(false);
-                }}
-              >
-                <Trash2 className="w-4 h-4 mr-2" />
-                Clear all memory
-              </Button>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => downloadMemoryPDF(aiMemory.memory)}
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Export as PDF
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full text-destructive hover:text-destructive"
+                  onClick={() => {
+                    aiMemory.clearMemory();
+                    toast.success("AI memory cleared");
+                    setShowMemory(false);
+                  }}
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Clear all memory
+                </Button>
             </div>
           )}
         </DialogContent>
