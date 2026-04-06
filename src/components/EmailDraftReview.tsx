@@ -40,7 +40,7 @@ export default function EmailDraftReview() {
         return;
       }
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("email_drafts")
         .select("*")
         .eq("user_id", user.id)
