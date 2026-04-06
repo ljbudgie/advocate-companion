@@ -163,7 +163,7 @@
 }
 
 .reading-mode [data-message-bubble] {
-  background-color: #FAF8F2;
+  background-color: hsl(var(--card));
 }
 
 /* ── Focus styles ── */
