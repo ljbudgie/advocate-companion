@@ -275,14 +275,28 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
               <div className="flex items-center gap-2">
                 <span className="text-xs text-muted-foreground">{msg.timestamp.toLocaleTimeString()}</span>
                 {(msg.role === "staff-display" || msg.role === "assistant") && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-xs h-7 px-2 text-accent"
-                    onClick={() => setShowStaff(msg.content)}
-                  >
-                    <Maximize2 className="w-3 h-3 mr-1" /> Show to staff
-                  </Button>
+                  <>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-xs h-7 px-2 text-accent"
+                      onClick={() => setShowStaff(msg.content)}
+                    >
+                      <Maximize2 className="w-3 h-3 mr-1" /> Show to staff
+                    </Button>
+                    {tts.isSupported && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-xs h-7 px-2 text-accent"
+                        onClick={() => tts.toggle(msg.content)}
+                        aria-label={tts.isSpeaking ? "Stop reading" : "Read aloud"}
+                      >
+                        {tts.isSpeaking ? <VolumeX className="w-3 h-3 mr-1" /> : <Volume2 className="w-3 h-3 mr-1" />}
+                        {tts.isSpeaking ? "Stop" : "Read aloud"}
+                      </Button>
+                    )}
+                  </>
                 )}
               </div>
             </div>
