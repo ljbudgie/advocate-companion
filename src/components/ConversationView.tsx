@@ -5,7 +5,7 @@ import type { Message } from "@/types/burgess";
 import type { SavedConversation } from "@/hooks/useConversationStorage";
 import StaffDisplay from "./StaffDisplay";
 import { supabase } from "@/integrations/supabase/client";
-import { Shield, Maximize2, Copy, Mail, Send, Sparkles, RotateCcw, Info, Download, MoreVertical, X, Glasses, WifiOff } from "lucide-react";
+import { Shield, Maximize2, Copy, Mail, Send, Sparkles, RotateCcw, Info, Download, MoreVertical, X, Glasses, WifiOff, Mic, MicOff } from "lucide-react";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
 import { useNavigate } from "react-router-dom";
@@ -13,6 +13,7 @@ import { downloadLogPDF } from "@/lib/generateLogPDF";
 import { useReadingMode } from "@/hooks/useReadingMode";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import { offlineTemplates } from "@/lib/offlineTemplates";
+import { useSpeechToText } from "@/hooks/useSpeechToText";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -78,6 +79,13 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
   const [showHints, setShowHints] = useState(isFirstConversation);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  const staffSpeech = useSpeechToText({
+    onResult: (transcript) => setStaffReply((prev) => (prev ? prev + " " : "") + transcript),
+  });
+  const aiSpeech = useSpeechToText({
+    onResult: (transcript) => setAiHelper((prev) => (prev ? prev + " " : "") + transcript),
+  });
 
   // Auto-save when messages change
   const saveTimeout = useRef<ReturnType<typeof setTimeout>>();
@@ -333,11 +341,22 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
                   <Input
                     value={staffReply}
                     onChange={(e) => setStaffReply(e.target.value)}
-                    placeholder="Type or summarise their response..."
+                    placeholder={staffSpeech.isListening ? "Listening..." : "Type or summarise their response..."}
                     className="h-12 text-base"
                     onKeyDown={(e) => e.key === "Enter" && handleStaffReply()}
                     disabled={isLoading}
                   />
+                  {staffSpeech.isSupported && (
+                    <Button
+                      variant={staffSpeech.isListening ? "default" : "outline"}
+                      onClick={staffSpeech.toggle}
+                      className={`h-12 px-3 ${staffSpeech.isListening ? "animate-pulse" : ""}`}
+                      aria-label={staffSpeech.isListening ? "Stop listening" : "Speak"}
+                      disabled={isLoading}
+                    >
+                      {staffSpeech.isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                    </Button>
+                  )}
                   <Button onClick={handleStaffReply} disabled={isLoading || !staffReply.trim()} className="h-12 px-4" aria-label="Send message">
                     <Send className="w-4 h-4" />
                   </Button>
@@ -355,11 +374,22 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
                   <Input
                     value={aiHelper}
                     onChange={(e) => setAiHelper(e.target.value)}
-                    placeholder="e.g. make it firmer, more polite, suggest another approach..."
+                    placeholder={aiSpeech.isListening ? "Listening..." : "e.g. make it firmer, more polite, suggest another approach..."}
                     className="h-10 text-sm"
                     onKeyDown={(e) => e.key === "Enter" && handleAiHelper()}
                     disabled={isLoading}
                   />
+                  {aiSpeech.isSupported && (
+                    <Button
+                      variant={aiSpeech.isListening ? "default" : "outline"}
+                      onClick={aiSpeech.toggle}
+                      className={`h-10 px-3 ${aiSpeech.isListening ? "animate-pulse" : ""}`}
+                      aria-label={aiSpeech.isListening ? "Stop listening" : "Speak"}
+                      disabled={isLoading}
+                    >
+                      {aiSpeech.isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                    </Button>
+                  )}
                   <Button variant="outline" onClick={handleAiHelper} disabled={isLoading || !aiHelper.trim()} className="h-10 px-3" aria-label="Send message">
                     <Sparkles className="w-4 h-4" />
                   </Button>
