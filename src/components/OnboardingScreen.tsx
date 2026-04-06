@@ -120,6 +120,10 @@ export default function OnboardingScreen({ onComplete, onBack }: OnboardingScree
                   <Bot className="w-5 h-5 text-accent mt-0.5 shrink-0" />
                   <p className="text-sm text-muted-foreground">Tell us what they say back, and the AI will suggest your next response — always calm, polite, and firm.</p>
                 </div>
+                <div className="flex items-start gap-3">
+                  <Mic className="w-5 h-5 text-accent mt-0.5 shrink-0" />
+                  <p className="text-sm text-muted-foreground">Voice input is available — tap the microphone icon instead of typing.</p>
+                </div>
               </div>
               <p className="text-xs text-muted-foreground pt-1">
                 Your information stays on your device and is never stored.
