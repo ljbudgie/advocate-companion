@@ -286,6 +286,17 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
           )}
         </div>
 
+        {/* Screen reader live region for new messages */}
+        <div aria-live="polite" aria-atomic="false" className="sr-only">
+          {messages.length > 0 && (() => {
+            const last = messages[messages.length - 1];
+            if (last.role === "staff-display") return `New suggested message: ${last.content}`;
+            if (last.role === "assistant") return `AI adjustment: ${last.content}`;
+            return null;
+          })()}
+          {isLoading && "Generating response..."}
+        </div>
+
         <div className="border-t bg-card p-4 space-y-3">
           {!isOnline ? (
             <div className="space-y-3">
