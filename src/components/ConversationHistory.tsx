@@ -169,7 +169,7 @@ export default function ConversationHistory({ conversations, onResume, onNew, on
                   }}
                 >
                   <Trash2 className="w-4 h-4 mr-2" />
-                  Clear all memory
+                  Clear resolved sessions
                 </Button>
             </div>
           )}

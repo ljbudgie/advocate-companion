@@ -630,7 +630,7 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
                 }}
               >
                 <Trash2 className="w-4 h-4 mr-2" />
-                Clear all memory
+                Clear resolved sessions
               </Button>
             </div>
           )}
