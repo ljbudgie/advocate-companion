@@ -172,6 +172,12 @@ This project is licensed under the MIT License with additional terms for "The Bu
 
 ---
 
+## 🎨 Design Context for AI Agents
+
+The [`context/awesome-design-md-for-advocacy.md`](context/awesome-design-md-for-advocacy.md) file provides a curated set of accessibility-first design principles and prompt starters for AI coding agents. When using AI tools to generate or improve advocacy templates, letters, or UI components, include sections from this file in your prompt context to ensure the output is accessible, calm, and aligned with the Burgess Principle.
+
+---
+
 ## 🙏 Acknowledgements
 
 - [The Burgess Principle](https://github.com/ljbudgie/burgess-principle) ✦ the foundation behind this project
