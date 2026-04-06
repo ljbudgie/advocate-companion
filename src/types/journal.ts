@@ -7,6 +7,7 @@ export interface JournalEntry {
   dateSent: string;
   status: 'pending' | 'agreed' | 'refused' | 'ignored' | 'partial';
   theirResponse?: string;
+  conversationId?: string;
   followUps: {
     date: string;
     content: string;
