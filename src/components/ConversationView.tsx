@@ -260,7 +260,7 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => { saveToJournal(); onReset(); }}>Start over</AlertDialogAction>
+            <AlertDialogAction onClick={() => { saveToJournal(); summarizeAndSaveMemory(); onReset(); }}>Start over</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
