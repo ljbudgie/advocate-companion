@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Shield, Plus, Trash2, MessageSquare, Brain, Download } from "lucide-react";
+import { Shield, Plus, Trash2, MessageSquare, Brain, Download, X } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -108,10 +108,24 @@ export default function ConversationHistory({ conversations, onResume, onNew, on
               )}
 
               {aiMemory.memory.entries.map((entry) => (
-                <div key={entry.id} className="rounded-lg border p-3 space-y-2">
-                  <p className="text-xs text-muted-foreground">
-                    {new Date(entry.date).toLocaleDateString()}
-                  </p>
+                <div key={entry.id} className="rounded-lg border p-3 space-y-2 relative">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs text-muted-foreground">
+                      {new Date(entry.date).toLocaleDateString()}
+                    </p>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6 text-muted-foreground hover:text-destructive"
+                      onClick={() => {
+                        aiMemory.removeEntry(entry.id);
+                        toast.success("Entry removed");
+                      }}
+                      title="Remove this entry"
+                    >
+                      <X className="w-3 h-3" />
+                    </Button>
+                  </div>
                   {entry.effectiveStrategies.length > 0 && (
                     <div>
                       <p className="text-xs font-medium text-muted-foreground">Effective strategies</p>
@@ -155,7 +169,7 @@ export default function ConversationHistory({ conversations, onResume, onNew, on
                   }}
                 >
                   <Trash2 className="w-4 h-4 mr-2" />
-                  Clear all memory
+                  Clear resolved sessions
                 </Button>
             </div>
           )}
