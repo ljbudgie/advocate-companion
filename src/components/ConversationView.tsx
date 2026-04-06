@@ -5,7 +5,7 @@ import type { Message } from "@/types/burgess";
 import type { SavedConversation } from "@/hooks/useConversationStorage";
 import StaffDisplay from "./StaffDisplay";
 import { supabase } from "@/integrations/supabase/client";
-import { Shield, Maximize2, Copy, Mail, Send, Sparkles, RotateCcw, Info, Download, MoreVertical, X, Glasses, WifiOff, Mic, MicOff } from "lucide-react";
+import { Shield, Maximize2, Copy, Mail, Send, Sparkles, RotateCcw, Info, Download, MoreVertical, X, WifiOff, Mic, MicOff } from "lucide-react";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
 import { useNavigate } from "react-router-dom";
