@@ -98,6 +98,44 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
   });
   const tts = useTextToSpeech();
 
+  // Journal integration
+  const existingJournalEntry = journalEntries.find((e) => e.conversationId === conversation.id);
+
+  const saveToJournal = useCallback(() => {
+    if (messages.length === 0) return;
+    const staffDisplayMessages = messages.filter((m) => m.role === "staff-display");
+    const userMessages = messages.filter((m) => m.role === "user");
+    const firstMessage = staffDisplayMessages[0]?.content || "";
+    const staffReplies = userMessages.map((m) => m.content.replace(/^Staff said: "?|"?$/g, "")).join("\n\n");
+
+    if (existingJournalEntry) {
+      updateEntry(existingJournalEntry.id, {
+        messageSent: staffDisplayMessages.map((m) => m.content).join("\n\n---\n\n"),
+        theirResponse: staffReplies || undefined,
+      });
+      toast.success("Journal entry updated");
+    } else {
+      const entry: JournalEntry = {
+        id: crypto.randomUUID(),
+        title: `Conversation — ${profile.adjustment || "general advocacy"}`,
+        recipient: "Staff member",
+        context: profile.context || profile.adjustment || "",
+        messageSent: firstMessage,
+        dateSent: new Date().toISOString(),
+        status: "pending",
+        theirResponse: staffReplies || undefined,
+        conversationId: conversation.id,
+        followUps: staffDisplayMessages.slice(1).map((m) => ({
+          date: m.timestamp instanceof Date ? m.timestamp.toISOString() : new Date(m.timestamp).toISOString(),
+          content: m.content,
+          generatedBy: "ai" as const,
+        })),
+      };
+      addEntry(entry);
+      toast.success("Saved to journal");
+    }
+  }, [messages, conversation.id, existingJournalEntry, profile, addEntry, updateEntry]);
+
   // Auto-save when messages change
   const saveTimeout = useRef<ReturnType<typeof setTimeout>>();
   useEffect(() => {
