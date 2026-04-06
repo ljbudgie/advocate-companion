@@ -9,7 +9,7 @@ import {
   SheetTrigger,
   SheetDescription,
 } from "@/components/ui/sheet";
-import { Accessibility, RotateCcw, Type, Eye, Zap, BookOpen, AlignJustify } from "lucide-react";
+import { Accessibility, RotateCcw, Type, Eye, Zap, BookOpen, AlignJustify, Moon } from "lucide-react";
 import { useAccessibility } from "@/hooks/useAccessibility";
 
 export default function AccessibilityPanel() {
