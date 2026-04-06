@@ -94,6 +94,7 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
   const aiSpeech = useSpeechToText({
     onResult: (transcript) => setAiHelper((prev) => (prev ? prev + " " : "") + transcript),
   });
+  const tts = useTextToSpeech();
 
   // Auto-save when messages change
   const saveTimeout = useRef<ReturnType<typeof setTimeout>>();
