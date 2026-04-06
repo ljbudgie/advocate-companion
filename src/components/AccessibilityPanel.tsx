@@ -94,6 +94,19 @@ export default function AccessibilityPanel() {
           {/* Toggles */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
+              <Label htmlFor="dark-mode" className="flex items-center gap-2 text-sm cursor-pointer">
+                <Moon className="w-4 h-4" />
+                Dark Mode
+              </Label>
+              <Switch
+                id="dark-mode"
+                checked={settings.darkMode}
+                onCheckedChange={(v) => update({ darkMode: v })}
+                aria-label="Toggle dark mode"
+              />
+            </div>
+
+            <div className="flex items-center justify-between">
               <Label htmlFor="high-contrast" className="flex items-center gap-2 text-sm cursor-pointer">
                 <Eye className="w-4 h-4" />
                 High Contrast
@@ -135,6 +148,7 @@ export default function AccessibilityPanel() {
 
           {/* Info */}
           <div className="rounded-xl bg-muted p-3 text-xs text-muted-foreground space-y-1">
+            <p><strong>Dark Mode</strong> reduces brightness — easier on eyes in low light.</p>
             <p><strong>Reading Mode</strong> increases letter spacing, line height, and removes italics — helpful for dyslexia.</p>
             <p><strong>High Contrast</strong> sharpens colours for better visibility.</p>
             <p><strong>Reduce Motion</strong> disables animations for those sensitive to movement.</p>
