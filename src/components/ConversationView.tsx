@@ -168,27 +168,41 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
     return resp.data?.response || "I'm unable to generate a response right now. Please try again.";
   };
 
-  const summarizeAndSaveMemory = async () => {
-    if (messages.length < 2) return; // No meaningful conversation to summarize
-    try {
-      const resp = await supabase.functions.invoke("burgess-copilot", {
-        body: {
-          mode: "summarize",
-          profile,
-          conversationLog: messages.map(m => ({ role: m.role, content: m.content })),
-        },
-      });
+  const summarizeAndSaveMemory = () => {
+    if (messages.length < 2) return;
+    // Fire-and-forget: save directly to localStorage so it persists even after unmount
+    const messagesSnapshot = messages.map(m => ({ role: m.role, content: m.content }));
+    const profileSnapshot = { ...profile };
+    
+    supabase.functions.invoke("burgess-copilot", {
+      body: {
+        mode: "summarize",
+        profile: profileSnapshot,
+        conversationLog: messagesSnapshot,
+      },
+    }).then((resp) => {
       if (resp.data?.summary) {
-        aiMemory.addEntry({
+        // Write directly to localStorage (component may have unmounted)
+        const STORAGE_KEY = "burgess-ai-memory";
+        let memory = { entries: [] as any[], preferredTone: "", updatedAt: "" };
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) memory = JSON.parse(raw);
+        } catch {}
+        
+        const newEntry = {
           id: crypto.randomUUID(),
           date: new Date().toISOString(),
           ...resp.data.summary,
-        });
+        };
+        memory.entries = [newEntry, ...memory.entries].slice(0, 10);
+        memory.preferredTone = resp.data.summary.preferredTone || memory.preferredTone;
+        memory.updatedAt = new Date().toISOString();
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(memory));
       }
-    } catch (e) {
+    }).catch((e) => {
       console.error("Failed to summarize conversation for memory:", e);
-      // Non-critical — don't block the user
-    }
+    });
   };
 
   const handleStaffReply = async () => {
