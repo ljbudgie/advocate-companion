@@ -49,10 +49,25 @@ export function useAIMemory() {
     });
   }, []);
 
+  const removeEntry = useCallback((entryId: string) => {
+    setMemory((prev) => {
+      const updated: AIMemory = {
+        ...prev,
+        entries: prev.entries.filter((e) => e.id !== entryId),
+        updatedAt: new Date().toISOString(),
+      };
+      saveMemory(updated);
+      return updated;
+    });
+  }, []);
+
   const clearMemory = useCallback(() => {
-    const empty: AIMemory = { entries: [], preferredTone: "", updatedAt: "" };
-    saveMemory(empty);
-    setMemory(empty);
+    // Preserve preferredTone — only clear situation entries
+    setMemory((prev) => {
+      const updated: AIMemory = { entries: [], preferredTone: prev.preferredTone, updatedAt: prev.updatedAt };
+      saveMemory(updated);
+      return updated;
+    });
   }, []);
 
   const getContextForPrompt = useCallback((): string => {
