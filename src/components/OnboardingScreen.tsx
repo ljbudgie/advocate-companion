@@ -7,6 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import type { UserProfile } from "@/types/burgess";
 import { Shield, Info, ArrowLeft, MessageSquare, Eye, Bot, Mic } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import AccessibilityPanel from "./AccessibilityPanel";
 
 interface OnboardingScreenProps {
   onComplete: (profile: UserProfile) => void;
@@ -81,7 +82,10 @@ export default function OnboardingScreen({ onComplete, onBack }: OnboardingScree
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4 relative">
+      <div className="absolute top-3 right-3">
+        <AccessibilityPanel />
+      </div>
       <div className="w-full max-w-md">
         {step === 0 && (
           <div className="text-center space-y-8 animate-in fade-in duration-700">
