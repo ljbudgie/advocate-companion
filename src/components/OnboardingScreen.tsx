@@ -7,6 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import type { UserProfile } from "@/types/burgess";
 import { Shield, Info, ArrowLeft, MessageSquare, Eye, Bot, Mic } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import AccessibilityPanel from "./AccessibilityPanel";
 
 interface OnboardingScreenProps {
   onComplete: (profile: UserProfile) => void;
