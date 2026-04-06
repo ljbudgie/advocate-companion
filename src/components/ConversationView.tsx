@@ -336,6 +336,9 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
                   </div>
                 )}
                 <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => setShowMemory(true)}>
+                  <Brain className="w-4 h-4 mr-2" /> AI Memory
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setShowResetConfirm(true)} className="text-destructive focus:text-destructive">
                   <RotateCcw className="w-4 h-4 mr-2" /> Start over
                 </DropdownMenuItem>
