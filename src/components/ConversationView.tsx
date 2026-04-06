@@ -226,6 +226,24 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
                   <Download className="w-4 h-4 mr-2" /> Download PDF
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
+                {tts.isSupported && tts.voices.length > 1 && (
+                  <div className="px-2 py-2">
+                    <label className="text-xs font-medium text-muted-foreground mb-1 block">Read-aloud voice</label>
+                    <Select value={tts.selectedVoice} onValueChange={tts.setSelectedVoice}>
+                      <SelectTrigger className="h-8 text-xs">
+                        <SelectValue placeholder="Choose voice" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {tts.voices.map((v) => (
+                          <SelectItem key={v.id} value={v.id} className="text-xs">
+                            {v.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => setShowResetConfirm(true)} className="text-destructive focus:text-destructive">
                   <RotateCcw className="w-4 h-4 mr-2" /> Start over
                 </DropdownMenuItem>
