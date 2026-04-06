@@ -15,6 +15,7 @@ import type { JournalEntry } from "@/types/journal";
 import AccessibilityPanel from "./AccessibilityPanel";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import { offlineTemplates } from "@/lib/offlineTemplates";
+import { useAIMemory } from "@/hooks/useAIMemory";
 import { useSpeechToText } from "@/hooks/useSpeechToText";
 import { useTextToSpeech } from "@/hooks/useTextToSpeech";
 import {
