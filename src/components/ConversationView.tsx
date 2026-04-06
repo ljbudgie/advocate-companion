@@ -15,6 +15,7 @@ import type { JournalEntry } from "@/types/journal";
 import AccessibilityPanel from "./AccessibilityPanel";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import { offlineTemplates } from "@/lib/offlineTemplates";
+import { useAIMemory } from "@/hooks/useAIMemory";
 import { useSpeechToText } from "@/hooks/useSpeechToText";
 import { useTextToSpeech } from "@/hooks/useTextToSpeech";
 import {
@@ -65,6 +66,7 @@ function generateOpeningMessage(profile: SavedConversation["profile"]): string {
 export default function ConversationView({ conversation, onSave, onReset }: ConversationViewProps) {
   const navigate = useNavigate();
   const { entries: journalEntries, addEntry, updateEntry } = useJournal();
+  const aiMemory = useAIMemory();
   const isOnline = useOnlineStatus();
   const profile = conversation.profile;
   const isFirstConversation = conversation.messages.length === 0;
@@ -158,11 +160,35 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
   
 
   const callAI = async (systemContext: string, userMessage: string): Promise<string> => {
+    const memoryContext = aiMemory.getContextForPrompt();
     const resp = await supabase.functions.invoke("burgess-copilot", {
-      body: { systemContext, userMessage, profile, conversationLog: messages.map(m => ({ role: m.role, content: m.content })) },
+      body: { systemContext, userMessage, profile, memoryContext, conversationLog: messages.map(m => ({ role: m.role, content: m.content })) },
     });
     if (resp.error) throw new Error(resp.error.message || "AI request failed");
     return resp.data?.response || "I'm unable to generate a response right now. Please try again.";
+  };
+
+  const summarizeAndSaveMemory = async () => {
+    if (messages.length < 2) return; // No meaningful conversation to summarize
+    try {
+      const resp = await supabase.functions.invoke("burgess-copilot", {
+        body: {
+          mode: "summarize",
+          profile,
+          conversationLog: messages.map(m => ({ role: m.role, content: m.content })),
+        },
+      });
+      if (resp.data?.summary) {
+        aiMemory.addEntry({
+          id: crypto.randomUUID(),
+          date: new Date().toISOString(),
+          ...resp.data.summary,
+        });
+      }
+    } catch (e) {
+      console.error("Failed to summarize conversation for memory:", e);
+      // Non-critical — don't block the user
+    }
   };
 
   const handleStaffReply = async () => {
@@ -234,7 +260,7 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => { saveToJournal(); onReset(); }}>Start over</AlertDialogAction>
+            <AlertDialogAction onClick={() => { saveToJournal(); summarizeAndSaveMemory(); onReset(); }}>Start over</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
