@@ -105,7 +105,50 @@
   }
 }
 
-/* Dyslexia-friendly reading mode */
+/* ── Accessibility: Font size ── */
+.a11y-font-large {
+  font-size: 112.5%;
+}
+.a11y-font-xl {
+  font-size: 125%;
+}
+
+/* ── Accessibility: Line spacing ── */
+.a11y-spacing-relaxed {
+  line-height: 1.9;
+}
+.a11y-spacing-loose {
+  line-height: 2.2;
+}
+
+/* ── Accessibility: High contrast ── */
+.a11y-high-contrast {
+  --foreground: 0 0% 0%;
+  --background: 0 0% 100%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 0%;
+  --primary: 0 0% 0%;
+  --primary-foreground: 0 0% 100%;
+  --muted-foreground: 0 0% 20%;
+  --border: 0 0% 0%;
+  --accent: 25 100% 40%;
+  --accent-foreground: 0 0% 100%;
+}
+
+.a11y-high-contrast [data-message-bubble] {
+  border: 2px solid hsl(0 0% 0%);
+}
+
+/* ── Accessibility: Reduced motion ── */
+.a11y-reduced-motion,
+.a11y-reduced-motion * {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* ── Accessibility: Reading mode (dyslexia-friendly) ── */
 .reading-mode {
   font-size: 115%;
   line-height: 2.1;
@@ -121,4 +164,23 @@
 
 .reading-mode [data-message-bubble] {
   background-color: #FAF8F2;
+}
+
+/* ── Focus styles ── */
+:focus-visible {
+  outline: 3px solid hsl(var(--accent));
+  outline-offset: 2px;
+}
+
+/* ── Screen reader only (utility) ── */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }

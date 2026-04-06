@@ -5,12 +5,12 @@ import type { Message } from "@/types/burgess";
 import type { SavedConversation } from "@/hooks/useConversationStorage";
 import StaffDisplay from "./StaffDisplay";
 import { supabase } from "@/integrations/supabase/client";
-import { Shield, Maximize2, Copy, Mail, Send, Sparkles, RotateCcw, Info, Download, MoreVertical, X, Glasses, WifiOff, Mic, MicOff } from "lucide-react";
+import { Shield, Maximize2, Copy, Mail, Send, Sparkles, RotateCcw, Info, Download, MoreVertical, X, WifiOff, Mic, MicOff } from "lucide-react";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
 import { useNavigate } from "react-router-dom";
 import { downloadLogPDF } from "@/lib/generateLogPDF";
-import { useReadingMode } from "@/hooks/useReadingMode";
+import AccessibilityPanel from "./AccessibilityPanel";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import { offlineTemplates } from "@/lib/offlineTemplates";
 import { useSpeechToText } from "@/hooks/useSpeechToText";
@@ -54,7 +54,7 @@ function generateOpeningMessage(profile: SavedConversation["profile"]): string {
 
 export default function ConversationView({ conversation, onSave, onReset }: ConversationViewProps) {
   const navigate = useNavigate();
-  const { enabled: readingMode, toggle: toggleReadingMode } = useReadingMode();
+  
   const isOnline = useOnlineStatus();
   const isFirstConversation = conversation.messages.length === 0;
   const [openingMessage] = useState(() =>
@@ -196,15 +196,7 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
             <span className="font-serif font-semibold text-foreground">Burgess Principle</span>
           </div>
           <div className="flex gap-1">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleReadingMode}
-              aria-pressed={readingMode}
-              title="Reading mode"
-            >
-              <Glasses className="w-4 h-4" />
-            </Button>
+            <AccessibilityPanel />
             <Button variant="ghost" size="icon" onClick={() => navigate("/about")} title="About">
               <Info className="w-4 h-4" />
             </Button>
@@ -292,6 +284,17 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
               Thinking...
             </div>
           )}
+        </div>
+
+        {/* Screen reader live region for new messages */}
+        <div aria-live="polite" aria-atomic="false" className="sr-only">
+          {messages.length > 0 && (() => {
+            const last = messages[messages.length - 1];
+            if (last.role === "staff-display") return `New suggested message: ${last.content}`;
+            if (last.role === "assistant") return `AI adjustment: ${last.content}`;
+            return null;
+          })()}
+          {isLoading && "Generating response..."}
         </div>
 
         <div className="border-t bg-card p-4 space-y-3">
