@@ -82,7 +82,10 @@ export default function OnboardingScreen({ onComplete, onBack }: OnboardingScree
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4 relative">
+      <div className="absolute top-3 right-3">
+        <AccessibilityPanel />
+      </div>
       <div className="w-full max-w-md">
         {step === 0 && (
           <div className="text-center space-y-8 animate-in fade-in duration-700">
