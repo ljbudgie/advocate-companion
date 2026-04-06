@@ -225,6 +225,9 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
                 <DropdownMenuItem onClick={() => downloadLogPDF({ ...conversation, messages })}>
                   <Download className="w-4 h-4 mr-2" /> Download PDF
                 </DropdownMenuItem>
+                <DropdownMenuItem onClick={saveToJournal}>
+                  <BookOpen className="w-4 h-4 mr-2" /> {existingJournalEntry ? "Update journal" : "Save to journal"}
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 {tts.isSupported && tts.voices.length > 1 && (
                   <div className="px-2 py-2">
