@@ -11,9 +11,77 @@ serve(async (req) => {
   }
 
   try {
-    const { systemContext, userMessage, profile, conversationLog } = await req.json();
+    const body = await req.json();
+    const { mode } = body;
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+
+    // Memory summarization mode
+    if (mode === "summarize") {
+      const { conversationLog, profile } = body;
+
+      const summarizePrompt = `You are analysing a completed advocacy conversation. Extract structured memory that will help in future conversations.
+
+USER PROFILE:
+- Name: ${profile?.fullName || "Unknown"}
+- Issue/Adjustment: ${profile?.adjustment || "Not specified"}
+- Country: ${profile?.country || "Not specified"}
+
+CONVERSATION:
+${(conversationLog || []).map((m: { role: string; content: string }) => `${m.role}: ${m.content}`).join("\n")}
+
+Return a JSON object with these exact fields:
+{
+  "effectiveStrategies": ["list of arguments or approaches that seemed to work well"],
+  "preferredTone": "brief description of the tone the user seemed to prefer (e.g. 'firm but polite', 'very direct')",
+  "situationNotes": "brief summary of the situation and context",
+  "staffResponses": "how the staff member responded and any patterns noticed",
+  "lessonsLearned": "what to do differently or repeat next time"
+}
+
+Keep each field concise (1-2 sentences max). If a field isn't applicable, use an empty string or empty array.`;
+
+      const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-2.5-flash-lite",
+          messages: [
+            { role: "system", content: "You are a conversation analyst. Return only valid JSON, no markdown." },
+            { role: "user", content: summarizePrompt },
+          ],
+        }),
+      });
+
+      if (!response.ok) {
+        const text = await response.text();
+        console.error("AI gateway error (summarize):", response.status, text);
+        throw new Error("AI gateway error during summarization");
+      }
+
+      const data = await response.json();
+      const raw = data.choices?.[0]?.message?.content || "{}";
+      // Strip markdown code fences if present
+      const cleaned = raw.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+
+      try {
+        const summary = JSON.parse(cleaned);
+        return new Response(JSON.stringify({ summary }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      } catch {
+        console.error("Failed to parse summary JSON:", cleaned);
+        return new Response(JSON.stringify({ summary: null }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
+
+    // Default: conversation mode
+    const { systemContext, userMessage, profile, conversationLog, memoryContext } = body;
 
     const systemPrompt = `You are a calm, professional advocacy co-pilot helping people assert their right to be treated as individuals — not as a policy number.
 
@@ -28,6 +96,7 @@ USER PROFILE:
 - Country: ${profile?.country || "Not specified"}
 - Context: ${profile?.context || "None provided"}
 
+${memoryContext ? `\n${memoryContext}\n` : ""}
 GUIDELINES:
 1. Always be polite, calm, and professional — but firm when needed.
 2. Frame arguments in plain English that anyone can understand. Instead of "was a judicial mind applied", say things like: "Have you actually looked at my specific situation?" or "I'm asking you to consider my individual circumstances rather than just applying a blanket rule."
@@ -39,6 +108,7 @@ GUIDELINES:
 8. Never be aggressive or threatening — be assertive and informed.
 9. If asked to adjust tone: "firmer" means more direct about consequences; "polite" means softer but still asserting rights.
 10. Keep responses concise — they will be displayed on a phone screen. Use markdown bold for key phrases only.
+11. If memory from previous conversations is available, use it to build on what worked before and avoid repeating unsuccessful approaches.
 
 ADDITIONAL CONTEXT: ${systemContext}
 
