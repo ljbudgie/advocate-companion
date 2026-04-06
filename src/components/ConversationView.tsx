@@ -154,7 +154,7 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages]);
 
-  const profile = conversation.profile;
+  
 
   const callAI = async (systemContext: string, userMessage: string): Promise<string> => {
     const resp = await supabase.functions.invoke("burgess-copilot", {
