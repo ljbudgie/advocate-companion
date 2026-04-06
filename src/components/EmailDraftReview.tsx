@@ -1,12 +1,19 @@
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import type { Tables } from "@/integrations/supabase/types";
 import { Shield, Send, X, Sparkles, Mail, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
 
-type EmailDraft = Tables<"email_drafts">;
+interface EmailDraft {
+  id: string;
+  user_id: string;
+  sender_address: string;
+  original_subject: string;
+  generated_response: string;
+  status: string;
+  created_at: string;
+}
 
 const TONE_OPTIONS = ["formal", "balanced", "firm", "gentle"] as const;
 type Tone = (typeof TONE_OPTIONS)[number];
