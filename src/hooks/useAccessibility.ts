@@ -6,6 +6,7 @@ export interface AccessibilitySettings {
   reducedMotion: boolean;
   readingMode: boolean;
   lineSpacing: "default" | "relaxed" | "loose";
+  darkMode: boolean;
 }
 
 const STORAGE_KEY = "a11y-settings";
