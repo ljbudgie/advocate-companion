@@ -98,6 +98,7 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
   );
   const [showHints, setShowHints] = useState(isFirstConversation);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [showMemory, setShowMemory] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const staffSpeech = useSpeechToText({
