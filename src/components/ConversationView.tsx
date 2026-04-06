@@ -64,7 +64,7 @@ function generateOpeningMessage(profile: SavedConversation["profile"]): string {
 
 export default function ConversationView({ conversation, onSave, onReset }: ConversationViewProps) {
   const navigate = useNavigate();
-  
+  const { entries: journalEntries, addEntry, updateEntry } = useJournal();
   const isOnline = useOnlineStatus();
   const isFirstConversation = conversation.messages.length === 0;
   const [openingMessage] = useState(() =>
