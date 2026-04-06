@@ -80,6 +80,13 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  const staffSpeech = useSpeechToText({
+    onResult: (transcript) => setStaffReply((prev) => (prev ? prev + " " : "") + transcript),
+  });
+  const aiSpeech = useSpeechToText({
+    onResult: (transcript) => setAiHelper((prev) => (prev ? prev + " " : "") + transcript),
+  });
+
   // Auto-save when messages change
   const saveTimeout = useRef<ReturnType<typeof setTimeout>>();
   useEffect(() => {
