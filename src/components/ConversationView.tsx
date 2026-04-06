@@ -13,6 +13,7 @@ import { downloadLogPDF } from "@/lib/generateLogPDF";
 import { useReadingMode } from "@/hooks/useReadingMode";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import { offlineTemplates } from "@/lib/offlineTemplates";
+import { useSpeechToText } from "@/hooks/useSpeechToText";
 import {
   AlertDialog,
   AlertDialogAction,
