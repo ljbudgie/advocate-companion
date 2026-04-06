@@ -1,12 +1,19 @@
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import type { Tables } from "@/integrations/supabase/types";
 import { Shield, Send, X, Sparkles, Mail, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
 
-type EmailDraft = Tables<"email_drafts">;
+interface EmailDraft {
+  id: string;
+  user_id: string;
+  sender_address: string;
+  original_subject: string;
+  generated_response: string;
+  status: string;
+  created_at: string;
+}
 
 const TONE_OPTIONS = ["formal", "balanced", "firm", "gentle"] as const;
 type Tone = (typeof TONE_OPTIONS)[number];
@@ -33,7 +40,7 @@ export default function EmailDraftReview() {
         return;
       }
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("email_drafts")
         .select("*")
         .eq("user_id", user.id)
@@ -72,7 +79,7 @@ export default function EmailDraftReview() {
       const newResponse = resp.data?.response;
       if (!newResponse) throw new Error("Empty AI response");
 
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from("email_drafts")
         .update({ generated_response: newResponse })
         .eq("id", draft.id);
@@ -117,7 +124,7 @@ export default function EmailDraftReview() {
 
   const handleDismiss = async (draft: EmailDraft) => {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from("email_drafts")
         .update({ status: "dismissed" })
         .eq("id", draft.id);
