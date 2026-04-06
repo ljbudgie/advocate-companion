@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Shield, Plus, Trash2, MessageSquare, Brain, Download } from "lucide-react";
+import { Shield, Plus, Trash2, MessageSquare, Brain, Download, X } from "lucide-react";
 import {
   Dialog,
   DialogContent,
