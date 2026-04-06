@@ -160,11 +160,35 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
   
 
   const callAI = async (systemContext: string, userMessage: string): Promise<string> => {
+    const memoryContext = aiMemory.getContextForPrompt();
     const resp = await supabase.functions.invoke("burgess-copilot", {
-      body: { systemContext, userMessage, profile, conversationLog: messages.map(m => ({ role: m.role, content: m.content })) },
+      body: { systemContext, userMessage, profile, memoryContext, conversationLog: messages.map(m => ({ role: m.role, content: m.content })) },
     });
     if (resp.error) throw new Error(resp.error.message || "AI request failed");
     return resp.data?.response || "I'm unable to generate a response right now. Please try again.";
+  };
+
+  const summarizeAndSaveMemory = async () => {
+    if (messages.length < 2) return; // No meaningful conversation to summarize
+    try {
+      const resp = await supabase.functions.invoke("burgess-copilot", {
+        body: {
+          mode: "summarize",
+          profile,
+          conversationLog: messages.map(m => ({ role: m.role, content: m.content })),
+        },
+      });
+      if (resp.data?.summary) {
+        aiMemory.addEntry({
+          id: crypto.randomUUID(),
+          date: new Date().toISOString(),
+          ...resp.data.summary,
+        });
+      }
+    } catch (e) {
+      console.error("Failed to summarize conversation for memory:", e);
+      // Non-critical — don't block the user
+    }
   };
 
   const handleStaffReply = async () => {
