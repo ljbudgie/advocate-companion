@@ -374,11 +374,22 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
                   <Input
                     value={aiHelper}
                     onChange={(e) => setAiHelper(e.target.value)}
-                    placeholder="e.g. make it firmer, more polite, suggest another approach..."
+                    placeholder={aiSpeech.isListening ? "Listening..." : "e.g. make it firmer, more polite, suggest another approach..."}
                     className="h-10 text-sm"
                     onKeyDown={(e) => e.key === "Enter" && handleAiHelper()}
                     disabled={isLoading}
                   />
+                  {aiSpeech.isSupported && (
+                    <Button
+                      variant={aiSpeech.isListening ? "default" : "outline"}
+                      onClick={aiSpeech.toggle}
+                      className={`h-10 px-3 ${aiSpeech.isListening ? "animate-pulse" : ""}`}
+                      aria-label={aiSpeech.isListening ? "Stop listening" : "Speak"}
+                      disabled={isLoading}
+                    >
+                      {aiSpeech.isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                    </Button>
+                  )}
                   <Button variant="outline" onClick={handleAiHelper} disabled={isLoading || !aiHelper.trim()} className="h-10 px-3" aria-label="Send message">
                     <Sparkles className="w-4 h-4" />
                   </Button>
