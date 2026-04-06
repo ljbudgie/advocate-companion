@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
 import { useNavigate } from "react-router-dom";
 import { downloadLogPDF } from "@/lib/generateLogPDF";
+import { downloadMemoryPDF } from "@/lib/generateMemoryPDF";
 import { useJournal } from "@/hooks/useJournal";
 import type { JournalEntry } from "@/types/journal";
 import AccessibilityPanel from "./AccessibilityPanel";
