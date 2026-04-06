@@ -124,7 +124,7 @@ export default function EmailDraftReview() {
 
   const handleDismiss = async (draft: EmailDraft) => {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from("email_drafts")
         .update({ status: "dismissed" })
         .eq("id", draft.id);
