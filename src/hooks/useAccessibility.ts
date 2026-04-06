@@ -6,6 +6,7 @@ export interface AccessibilitySettings {
   reducedMotion: boolean;
   readingMode: boolean;
   lineSpacing: "default" | "relaxed" | "loose";
+  darkMode: boolean;
 }
 
 const STORAGE_KEY = "a11y-settings";
@@ -16,6 +17,7 @@ const defaults: AccessibilitySettings = {
   reducedMotion: false,
   readingMode: false,
   lineSpacing: "default",
+  darkMode: false,
 };
 
 function loadSettings(): AccessibilitySettings {
@@ -58,6 +60,9 @@ export function useAccessibility() {
     root.classList.remove("a11y-spacing-relaxed", "a11y-spacing-loose");
     if (settings.lineSpacing === "relaxed") root.classList.add("a11y-spacing-relaxed");
     if (settings.lineSpacing === "loose") root.classList.add("a11y-spacing-loose");
+
+    // Dark mode
+    root.classList.toggle("dark", settings.darkMode);
   }, [settings]);
 
   const update = useCallback(
