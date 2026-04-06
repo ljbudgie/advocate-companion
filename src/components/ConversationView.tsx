@@ -341,11 +341,22 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
                   <Input
                     value={staffReply}
                     onChange={(e) => setStaffReply(e.target.value)}
-                    placeholder="Type or summarise their response..."
+                    placeholder={staffSpeech.isListening ? "Listening..." : "Type or summarise their response..."}
                     className="h-12 text-base"
                     onKeyDown={(e) => e.key === "Enter" && handleStaffReply()}
                     disabled={isLoading}
                   />
+                  {staffSpeech.isSupported && (
+                    <Button
+                      variant={staffSpeech.isListening ? "default" : "outline"}
+                      onClick={staffSpeech.toggle}
+                      className={`h-12 px-3 ${staffSpeech.isListening ? "animate-pulse" : ""}`}
+                      aria-label={staffSpeech.isListening ? "Stop listening" : "Speak"}
+                      disabled={isLoading}
+                    >
+                      {staffSpeech.isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                    </Button>
+                  )}
                   <Button onClick={handleStaffReply} disabled={isLoading || !staffReply.trim()} className="h-12 px-4" aria-label="Send message">
                     <Send className="w-4 h-4" />
                   </Button>
