@@ -541,6 +541,78 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
           )}
         </div>
       </div>
+      {/* Memory Dialog */}
+      <Dialog open={showMemory} onOpenChange={setShowMemory}>
+        <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Brain className="w-5 h-5 text-primary" />
+              AI Memory
+            </DialogTitle>
+            <DialogDescription>
+              Things the AI has learned from your past conversations to give better advice.
+            </DialogDescription>
+          </DialogHeader>
+
+          {aiMemory.memory.entries.length === 0 ? (
+            <p className="text-sm text-muted-foreground py-4 text-center">
+              No memories yet. The AI will learn from your conversations when you tap "Start over".
+            </p>
+          ) : (
+            <div className="space-y-4">
+              {aiMemory.memory.preferredTone && (
+                <div className="rounded-lg bg-muted p-3">
+                  <p className="text-xs font-medium text-muted-foreground mb-1">Preferred tone</p>
+                  <p className="text-sm">{aiMemory.memory.preferredTone}</p>
+                </div>
+              )}
+
+              {aiMemory.memory.entries.map((entry) => (
+                <div key={entry.id} className="rounded-lg border p-3 space-y-2">
+                  <p className="text-xs text-muted-foreground">
+                    {new Date(entry.date).toLocaleDateString()}
+                  </p>
+                  {entry.effectiveStrategies.length > 0 && (
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground">Effective strategies</p>
+                      <ul className="text-sm list-disc list-inside">
+                        {entry.effectiveStrategies.map((s, i) => (
+                          <li key={i}>{s}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  {entry.situationNotes && (
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground">Situation</p>
+                      <p className="text-sm">{entry.situationNotes}</p>
+                    </div>
+                  )}
+                  {entry.lessonsLearned && (
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground">Lessons learned</p>
+                      <p className="text-sm">{entry.lessonsLearned}</p>
+                    </div>
+                  )}
+                </div>
+              ))}
+
+              <Button
+                variant="outline"
+                className="w-full text-destructive hover:text-destructive"
+                onClick={() => {
+                  aiMemory.clearMemory();
+                  toast.success("AI memory cleared");
+                  setShowMemory(false);
+                }}
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Clear all memory
+              </Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
