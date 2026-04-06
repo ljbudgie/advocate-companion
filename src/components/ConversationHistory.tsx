@@ -11,6 +11,7 @@ import {
 import type { SavedConversation } from "@/hooks/useConversationStorage";
 import { useAIMemory } from "@/hooks/useAIMemory";
 import { toast } from "sonner";
+import { downloadMemoryPDF } from "@/lib/generateMemoryPDF";
 
 interface ConversationHistoryProps {
   conversations: SavedConversation[];
