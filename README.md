@@ -131,6 +131,16 @@ supabase/
 
 ---
 
+## 🧩 Skills
+
+Optional skill modules that extend the Advocate Companion with focused, self-contained capabilities.
+
+| Skill | Description |
+|-------|-------------|
+| [Contract Review with Burgess](skills/contract-review-with-burgess/) | A calm, clause-by-clause contract review that applies the Burgess binary to flag clauses needing human attention |
+
+---
+
 ## 🤝 Contributing
 
 Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to get involved.
