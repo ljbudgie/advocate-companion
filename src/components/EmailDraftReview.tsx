@@ -79,7 +79,7 @@ export default function EmailDraftReview() {
       const newResponse = resp.data?.response;
       if (!newResponse) throw new Error("Empty AI response");
 
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from("email_drafts")
         .update({ generated_response: newResponse })
         .eq("id", draft.id);
