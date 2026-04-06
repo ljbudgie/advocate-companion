@@ -5,11 +5,12 @@ import type { Message } from "@/types/burgess";
 import type { SavedConversation } from "@/hooks/useConversationStorage";
 import StaffDisplay from "./StaffDisplay";
 import { supabase } from "@/integrations/supabase/client";
-import { Shield, Maximize2, Copy, Mail, Send, Sparkles, RotateCcw, Info, Download, MoreVertical, X, WifiOff, Mic, MicOff, Volume2, VolumeX, BookOpen, Brain, Trash2 } from "lucide-react";
+import { Shield, Maximize2, Copy, Mail, Send, Sparkles, RotateCcw, Info, Download, MoreVertical, X, WifiOff, Mic, MicOff, Volume2, VolumeX, BookOpen, Brain, Trash2, FileDown } from "lucide-react";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
 import { useNavigate } from "react-router-dom";
 import { downloadLogPDF } from "@/lib/generateLogPDF";
+import { downloadMemoryPDF } from "@/lib/generateMemoryPDF";
 import { useJournal } from "@/hooks/useJournal";
 import type { JournalEntry } from "@/types/journal";
 import AccessibilityPanel from "./AccessibilityPanel";
@@ -597,6 +598,14 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
                 </div>
               ))}
 
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={() => downloadMemoryPDF(aiMemory.memory)}
+              >
+                <FileDown className="w-4 h-4 mr-2" />
+                Export as PDF
+              </Button>
               <Button
                 variant="outline"
                 className="w-full text-destructive hover:text-destructive"
