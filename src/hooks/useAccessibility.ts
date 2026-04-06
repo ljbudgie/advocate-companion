@@ -17,6 +17,7 @@ const defaults: AccessibilitySettings = {
   reducedMotion: false,
   readingMode: false,
   lineSpacing: "default",
+  darkMode: false,
 };
 
 function loadSettings(): AccessibilitySettings {
