@@ -1,6 +1,8 @@
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
+import { X, Volume2, VolumeX } from "lucide-react";
 import ReactMarkdown from "react-markdown";
+import { useTextToSpeech } from "@/hooks/useTextToSpeech";
 
 interface StaffDisplayProps {
   content: string;
@@ -8,9 +10,30 @@ interface StaffDisplayProps {
 }
 
 export default function StaffDisplay({ content, onClose }: StaffDisplayProps) {
+  const tts = useTextToSpeech();
+
+  // Stop speaking when closing
+  useEffect(() => {
+    return () => {
+      tts.stop();
+    };
+  }, []);
+
   return (
     <div className="fixed inset-0 z-50 staff-display flex flex-col">
-      <div className="flex justify-end p-4">
+      <div className="flex justify-between items-center p-4">
+        {tts.isSupported && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => tts.toggle(content)}
+            className="text-staff-foreground hover:bg-staff-foreground/10 gap-2"
+            aria-label={tts.isSpeaking ? "Stop reading" : "Read aloud"}
+          >
+            {tts.isSpeaking ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+            <span className="text-sm">{tts.isSpeaking ? "Stop" : "Read aloud"}</span>
+          </Button>
+        )}
         <Button
           variant="ghost"
           size="icon"

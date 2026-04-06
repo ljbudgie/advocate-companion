@@ -5,7 +5,7 @@ import type { Message } from "@/types/burgess";
 import type { SavedConversation } from "@/hooks/useConversationStorage";
 import StaffDisplay from "./StaffDisplay";
 import { supabase } from "@/integrations/supabase/client";
-import { Shield, Maximize2, Copy, Mail, Send, Sparkles, RotateCcw, Info, Download, MoreVertical, X, WifiOff, Mic, MicOff } from "lucide-react";
+import { Shield, Maximize2, Copy, Mail, Send, Sparkles, RotateCcw, Info, Download, MoreVertical, X, WifiOff, Mic, MicOff, Volume2, VolumeX } from "lucide-react";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
 import { useNavigate } from "react-router-dom";
@@ -14,6 +14,14 @@ import AccessibilityPanel from "./AccessibilityPanel";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import { offlineTemplates } from "@/lib/offlineTemplates";
 import { useSpeechToText } from "@/hooks/useSpeechToText";
+import { useTextToSpeech } from "@/hooks/useTextToSpeech";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -86,6 +94,7 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
   const aiSpeech = useSpeechToText({
     onResult: (transcript) => setAiHelper((prev) => (prev ? prev + " " : "") + transcript),
   });
+  const tts = useTextToSpeech();
 
   // Auto-save when messages change
   const saveTimeout = useRef<ReturnType<typeof setTimeout>>();
@@ -217,6 +226,24 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
                   <Download className="w-4 h-4 mr-2" /> Download PDF
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
+                {tts.isSupported && tts.voices.length > 1 && (
+                  <div className="px-2 py-2">
+                    <label className="text-xs font-medium text-muted-foreground mb-1 block">Read-aloud voice</label>
+                    <Select value={tts.selectedVoice} onValueChange={tts.setSelectedVoice}>
+                      <SelectTrigger className="h-8 text-xs">
+                        <SelectValue placeholder="Choose voice" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {tts.voices.map((v) => (
+                          <SelectItem key={v.id} value={v.id} className="text-xs">
+                            {v.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => setShowResetConfirm(true)} className="text-destructive focus:text-destructive">
                   <RotateCcw className="w-4 h-4 mr-2" /> Start over
                 </DropdownMenuItem>
@@ -266,14 +293,28 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
               <div className="flex items-center gap-2">
                 <span className="text-xs text-muted-foreground">{msg.timestamp.toLocaleTimeString()}</span>
                 {(msg.role === "staff-display" || msg.role === "assistant") && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-xs h-7 px-2 text-accent"
-                    onClick={() => setShowStaff(msg.content)}
-                  >
-                    <Maximize2 className="w-3 h-3 mr-1" /> Show to staff
-                  </Button>
+                  <>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-xs h-7 px-2 text-accent"
+                      onClick={() => setShowStaff(msg.content)}
+                    >
+                      <Maximize2 className="w-3 h-3 mr-1" /> Show to staff
+                    </Button>
+                    {tts.isSupported && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-xs h-7 px-2 text-accent"
+                        onClick={() => tts.toggle(msg.content)}
+                        aria-label={tts.isSpeaking ? "Stop reading" : "Read aloud"}
+                      >
+                        {tts.isSpeaking ? <VolumeX className="w-3 h-3 mr-1" /> : <Volume2 className="w-3 h-3 mr-1" />}
+                        {tts.isSpeaking ? "Stop" : "Read aloud"}
+                      </Button>
+                    )}
+                  </>
                 )}
               </div>
             </div>
