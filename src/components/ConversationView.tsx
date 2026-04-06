@@ -66,6 +66,7 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
   const navigate = useNavigate();
   const { entries: journalEntries, addEntry, updateEntry } = useJournal();
   const isOnline = useOnlineStatus();
+  const profile = conversation.profile;
   const isFirstConversation = conversation.messages.length === 0;
   const [openingMessage] = useState(() =>
     isFirstConversation ? generateOpeningMessage(conversation.profile) : null
