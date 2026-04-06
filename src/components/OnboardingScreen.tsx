@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import type { UserProfile } from "@/types/burgess";
-import { Shield, Info, ArrowLeft, MessageSquare, Eye, Bot } from "lucide-react";
+import { Shield, Info, ArrowLeft, MessageSquare, Eye, Bot, Mic } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface OnboardingScreenProps {
@@ -119,6 +119,10 @@ export default function OnboardingScreen({ onComplete, onBack }: OnboardingScree
                 <div className="flex items-start gap-3">
                   <Bot className="w-5 h-5 text-accent mt-0.5 shrink-0" />
                   <p className="text-sm text-muted-foreground">Tell us what they say back, and the AI will suggest your next response — always calm, polite, and firm.</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <Mic className="w-5 h-5 text-accent mt-0.5 shrink-0" />
+                  <p className="text-sm text-muted-foreground">Voice input is available — tap the microphone icon instead of typing.</p>
                 </div>
               </div>
               <p className="text-xs text-muted-foreground pt-1">
