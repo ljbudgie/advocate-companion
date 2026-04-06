@@ -100,5 +100,5 @@ export function useAIMemory() {
     return lines.join("\n");
   }, [memory]);
 
-  return { memory, addEntry, clearMemory, getContextForPrompt };
+  return { memory, addEntry, removeEntry, clearMemory, getContextForPrompt };
 }
