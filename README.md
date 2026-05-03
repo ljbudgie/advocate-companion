@@ -204,8 +204,8 @@ Recommended Mirror-facing data contract:
 type StandardInstitutionType = "employer" | "education" | "healthcare" | "retail" | "government" | "transport" | "housing";
 
 type MirrorInstitution =
-  | { institutionType: StandardInstitutionType; customInstitutionType?: never }
-  | { institutionType: "other"; customInstitutionType: string };
+  | { institutionType: StandardInstitutionType; otherInstitutionType?: never }
+  | { institutionType: "other"; otherInstitutionType: string };
 
 type MirrorRightsRequest = MirrorInstitution & {
   jurisdiction: string;
@@ -253,13 +253,14 @@ interface SensoryAccessProfile {
   customCommunicationModes?: Array<{
     mode: string;
     description: string;
-    experimental: boolean;
+    experimental: boolean; // true triggers clearer consent copy and institution-facing explanation text
   }>;
   auditoryNeeds?: string[];
   hapticProfiles?: Array<{
     id: string;
     label: string;
     purpose: "alerting" | "navigation" | "speech_substitution" | "environmental_awareness" | "other";
+    customPurpose?: string; // required by validation when purpose is "other"
     userControlled: boolean;
   }>;
   sensoryTriggers?: string[];
@@ -267,7 +268,8 @@ interface SensoryAccessProfile {
   medicalDeviceContext?: {
     deviceType: string;
     clinicianOrProvider?: string;
-    requestedChange?: string;
+    accessRequestCategory?: "communication" | "environment" | "appointment_format" | "device_review" | "documentation" | "other";
+    requestedChange?: string; // sanitize as user-described access need, not clinical recommendation
   };
 }
 ```
@@ -288,9 +290,9 @@ interface UnifiedUserContext {
   sensoryProfileId?: string;
   privacyMode:
     | "local_only"      // no network or ecosystem processing; local templates and local storage only
-    | "local_plus_ai"   // minimal prompt sent for AI generation; source records stay local
+    | "local_plus_ai"   // minimal prompt may go through Supabase Edge Functions to approved AI providers; source records stay local
     | "selective_sync"; // user-approved summaries or fields sync to ecosystem services
-  exportPolicy: "disabled" | "manual_casefile"; // explicit export capability, independent of sync mode
+  exportPolicy: "disabled" | "manual_case_file"; // explicit export capability, independent of sync mode
   consentScopes: SyncScope[];
 }
 
@@ -298,7 +300,8 @@ interface AdjustmentRequest {
   id: string;
   createdAt: string;
   updatedAt: string;
-  status: "draft" | "sent" | "pending" | "agreed" | "partial" | "refused" | "ignored" | "escalated";
+  stage: "draft" | "sent" | "awaiting_response" | "escalated" | "closed";
+  outcome?: "agreed" | "partial" | "refused" | "ignored";
   setting: "work" | "education" | "healthcare" | "public_service" | "commercial_service" | "transport" | "housing" | "other";
   requestedAdjustments: string[];
   reasonSummary: string;
@@ -318,7 +321,7 @@ interface BurgessPrincipleMetadata {
   blanketPolicyDetected: boolean;
   decisionMakerIdentified?: boolean;
   reasonsRequested?: boolean;
-  nullDecisionRisk: "low" | "medium" | "high"; // likelihood that the institution is applying a Burgess NULL blanket policy
+  blanketPolicyLikelihood: "low" | "medium" | "high"; // likelihood that the institution is applying a Burgess NULL blanket policy
   auditNotes?: string[];
 }
 ```
@@ -329,16 +332,10 @@ Recommended request lifecycle:
 stateDiagram-v2
   [*] --> draft
   draft --> sent
-  sent --> pending
-  pending --> agreed
-  pending --> partial
-  pending --> refused
-  pending --> ignored
-  partial --> escalated
-  refused --> escalated
-  ignored --> escalated
-  escalated --> agreed
-  escalated --> partial
+  sent --> awaiting_response
+  awaiting_response --> closed: agreed / partial
+  awaiting_response --> escalated: refused / ignored
+  escalated --> closed: agreed / partial / refused
 ```
 
 Recommended client architecture:
