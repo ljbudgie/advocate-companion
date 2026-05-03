@@ -253,14 +253,14 @@ interface SensoryAccessProfile {
   customCommunicationModes?: Array<{
     mode: string;
     description: string;
-    experimental: boolean; // true triggers clearer consent copy and institution-facing explanation text
+    experimental: boolean;
   }>;
   auditoryNeeds?: string[];
   hapticProfiles?: Array<{
     id: string;
     label: string;
     purpose: "alerting" | "navigation" | "speech_substitution" | "environmental_awareness" | "other";
-    customPurpose?: string; // required by validation when purpose is "other"
+    customPurpose?: string;
     userControlled: boolean;
   }>;
   sensoryTriggers?: string[];
@@ -269,10 +269,12 @@ interface SensoryAccessProfile {
     deviceType: string;
     clinicianOrProvider?: string;
     accessRequestCategory?: "communication" | "environment" | "appointment_format" | "device_review" | "documentation" | "other";
-    requestedChange?: string; // sanitize as user-described access need, not clinical recommendation
+    requestedChange?: string;
   };
 }
 ```
+
+OpenHear schema validation should treat `customPurpose` as required when haptic `purpose` is `"other"`. Experimental communication modes should trigger clearer consent copy and institution-facing explanation text. Medical-device free text, especially `requestedChange`, must be sanitized and framed as a user-described access need rather than diagnosis, treatment, clinical parameter adjustment, or medical configuration instruction.
 
 ### Shared state and data models
 
