@@ -204,6 +204,7 @@ Recommended Mirror-facing data contract:
 interface MirrorRightsRequest {
   jurisdiction: string;
   institutionType: "employer" | "education" | "healthcare" | "retail" | "government" | "transport" | "housing" | "other";
+  customInstitutionType?: string; // required when institutionType is "other"
   adjustmentCategory: string[];
   userContextSummary: string;
   decisionStage: "initial_request" | "follow_up" | "refusal" | "ignored" | "appeal";
@@ -245,6 +246,7 @@ Recommended OpenHear-facing data contract:
 interface SensoryAccessProfile {
   profileId: string;
   communicationModes: Array<"speech" | "text" | "captioning" | "sign" | "haptic" | "visual" | "other">;
+  customCommunicationModes?: string[]; // used only when a required mode is not yet standardized
   auditoryNeeds?: string[];
   hapticProfiles?: Array<{
     id: string;
@@ -280,7 +282,7 @@ interface UnifiedUserContext {
     | "local_only"      // no network processing; offline templates and local exports only
     | "local_plus_ai"   // minimal prompt sent for AI generation; source records stay local
     | "selective_sync"  // user-approved summaries or fields sync to ecosystem services
-    | "casefile_export"; // user-initiated evidence bundle export, not automatic sync
+    | "manual_export";  // user-controlled evidence bundle export capability; no automatic sync
   consentScopes: SyncScope[];
 }
 
@@ -308,7 +310,7 @@ interface BurgessPrincipleMetadata {
   blanketPolicyDetected: boolean;
   decisionMakerIdentified?: boolean;
   reasonsRequested?: boolean;
-  individualConsiderationRisk: "low" | "medium" | "high"; // risk that the decision is Burgess NULL: blanket policy without meaningful individual consideration
+  burgessNullRisk: "low" | "medium" | "high"; // risk of blanket policy without meaningful individual consideration
   auditNotes?: string[];
 }
 ```
@@ -426,7 +428,7 @@ Compared with typical advocacy tools, reasonable-adjustment templates, HR letter
 | Rich memory vs user control | Persistent memory can feel intrusive if users do not understand what is saved | Keep memory visible, editable, exportable, clearable, and opt-in for cloud sync |
 | Ecosystem integration vs complexity | Mirror, OpenHear, and nexus-ai-hub integrations could make the UI overwhelming | Hide complexity behind task-specific flows and progressive disclosure |
 | Legal precision vs readability | Overly legalistic responses may intimidate users or staff | Use Mirror for structured rights accuracy while keeping user-facing language plain and calm |
-| Medical-device specificity vs safety | Device and sensory recommendations can cross into clinical advice | Enforce prompt and UI guardrails: describe user needs, device context, access barriers, and requested accommodations; avoid diagnosis, treatment plans, dosage-style instructions, or clinician substitution |
+| Medical-device specificity vs safety | Device and sensory recommendations can cross into clinical advice | Enforce prompt and UI guardrails: describe user needs, device context, access barriers, and requested accommodations; avoid diagnosis, treatment plans, clinical parameter adjustments, medical configuration changes, or clinician substitution |
 | Biohacking and patient-led innovation vs institutional trust | Institutions may dismiss self-tested workflows or non-traditional assistive devices | Translate user-led experimentation into evidence, access need, risk reduction, and reasonable adjustment language |
 
 The ecosystem resolves these tensions by separating responsibilities:
