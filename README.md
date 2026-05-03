@@ -204,7 +204,7 @@ Recommended Mirror-facing data contract:
 interface MirrorRightsRequest {
   jurisdiction: string;
   institutionType: "employer" | "education" | "healthcare" | "retail" | "government" | "transport" | "housing" | "other";
-  customInstitutionType?: string; // required when institutionType is "other"
+  customInstitutionType?: string; // validation should require this when institutionType is "other"
   adjustmentCategory: string[];
   userContextSummary: string;
   decisionStage: "initial_request" | "follow_up" | "refusal" | "ignored" | "appeal";
@@ -246,7 +246,7 @@ Recommended OpenHear-facing data contract:
 interface SensoryAccessProfile {
   profileId: string;
   communicationModes: Array<"speech" | "text" | "captioning" | "sign" | "haptic" | "visual" | "other">;
-  customCommunicationModes?: string[]; // used only when a required mode is not yet standardized
+  customCommunicationModes?: string[]; // user-defined or experimental modes awaiting schema standardization
   auditoryNeeds?: string[];
   hapticProfiles?: Array<{
     id: string;
@@ -282,7 +282,7 @@ interface UnifiedUserContext {
     | "local_only"      // no network processing; offline templates and local exports only
     | "local_plus_ai"   // minimal prompt sent for AI generation; source records stay local
     | "selective_sync"  // user-approved summaries or fields sync to ecosystem services
-    | "manual_export";  // user-controlled evidence bundle export capability; no automatic sync
+    | "local_with_export"; // local-only operation with user-controlled evidence bundle export; no automatic sync
   consentScopes: SyncScope[];
 }
 
@@ -310,7 +310,7 @@ interface BurgessPrincipleMetadata {
   blanketPolicyDetected: boolean;
   decisionMakerIdentified?: boolean;
   reasonsRequested?: boolean;
-  burgessNullRisk: "low" | "medium" | "high"; // risk of blanket policy without meaningful individual consideration
+  blanketPolicyRisk: "low" | "medium" | "high"; // risk that the institution is applying a Burgess NULL blanket policy
   auditNotes?: string[];
 }
 ```
