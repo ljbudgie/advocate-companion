@@ -1,196 +1,430 @@
-# The Burgess Principle – Reasonable Adjustment Companion
+# Ecosystem Stack v2 — advocate-companion
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.8-blue?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![React](https://img.shields.io/badge/React-18.3-61DAFB?logo=react&logoColor=white)](https://react.dev/)
-[![Vite](https://img.shields.io/badge/Vite-5.4-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
-<a><img src="https://img.shields.io/badge/Accessibility-Audited-1D9E75?style=flat&logo=accessible-icon&logoColor=white"></a>
+## 1. Identity & Role in the Ecosystem
 
-An AI-powered Reasonable Adjustment Companion grounded in The Burgess Principle. It empowers individuals — especially those with hidden disabilities — to have confident, informed conversations with employers, service providers, and institutions. Whether starting a new request or responding to a difficult email you've received, the companion meets you where you are. Connect your Outlook or Hotmail inbox and the AI Co-Pilot will read incoming messages and draft a legally-grounded response — ready for you to review, adjust in tone, and send in your own name.
+**advocate-companion** is the practical advocacy UI layer of the Burgess Principle ecosystem: a privacy-first React/TypeScript web application that helps people with hidden disabilities, sensory access needs, chronic conditions, neurodivergence, and other individual circumstances request reasonable adjustments or accommodations in clear, calm, evidence-aware language.
 
----
+Its role is deliberately user-facing. Where the wider ecosystem contains institutional reasoning engines, sensory-sovereignty research, and central agent infrastructure, advocate-companion is the screen a person can actually use during a stressful interaction: at a reception desk, in an HR conversation, in a healthcare appointment, while replying to an email, or when documenting a refusal.
 
-## ✨ Features
+Within the three-pillar Burgess Principle ecosystem, advocate-companion sits at the human edge:
 
-- **Guided onboarding** ✦ Step-by-step setup capturing your name, adjustment type, country, and context
-- **31+ predefined adjustments** ✦ ADHD, anxiety, autism, chronic pain, mobility impairments, and more
-- **21 supported countries** ✦ Country-specific legal references (e.g. Equality Act 2010 for UK, ADA for US)
-- **AI Co-Pilot** ✦ Context-aware message generation grounded in The Burgess Principle
-- **Staff display mode** ✦ Full-screen, large-text view optimised for showing messages to staff
-- **Tone adjustment** ✦ Make messages firmer or more polite with a single tap
-- **Conversation history** ✦ Auto-saved conversations with timestamps and full transcript access
-- **PDF export** ✦ Export conversation logs as formatted PDF documents
-- **Email & clipboard** ✦ Copy messages for email or reference
-- **Outlook & Hotmail integration** ✦ Connect your inbox to receive and respond to emails directly through the companion
-- **Email draft review** ✦ Incoming emails are read by the AI Co-Pilot and a response draft is generated for you to approve before sending
-- **Power Automate bridge** ✦ Lightweight no-code pipeline for prototyping the email workflow without Graph webhook complexity
-- **Privacy-first** ✦ All data stored locally in your browser — no server-side tracking
-- **Response journal** ✦ Every message you send is saved locally with timestamps, searchable, and exportable as PDF — a personal record of every adjustment you've ever requested
-- **Follow-up threads** ✦ Log how each request was received (agreed, refused, ignored) and the AI generates your legally-grounded next step automatically
-- **Offline mode** ✦ Works without internet — curated templates grounded in The Burgess Principle are always available when the AI Co-Pilot can't connect
+- **Mirror — Institutional Accountability:** advocate-companion turns Mirror's rights mapping, Burgess Principle question engine, and letter-template logic into guided conversations, journal records, draft emails, escalation messages, and evidence packs that ordinary users can understand and send.
+- **OpenHear — Sensory Sovereignty:** advocate-companion gives OpenHear use cases a practical advocacy pathway: requesting hearing-aid adjustments, communication support, quiet clinical pathways, haptic or multisensory accommodations, patient-led device changes, and recognition of sensory substitution needs.
+- **nexus-ai-hub — Central Intelligence Layer:** advocate-companion should remain the accessible front door for Hermes Agent, MemPalace, OpenClaw Skills, and shared Burgess Principle services, while keeping sensitive state local unless the user explicitly opts into cloud or agent-backed workflows.
 
----
+The product is therefore not just another reasonable-adjustment form generator. It is the **frontline interface for individual consideration**: a local-first companion that helps a user move from lived experience to structured request, from institutional refusal to documented response, and from isolated casework to ecosystem-wide learning without surrendering privacy.
 
-## 🚀 Getting Started
-
-### Prerequisites
-
-- [Node.js](https://nodejs.org/) (v18 or later)
-- [npm](https://www.npmjs.com/) or [Bun](https://bun.sh/)
-
-### Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/ljbudgie/advocate-companion.git
-cd advocate-companion
-
-# Install dependencies
-npm install
-
-# Start the development server
-npm run dev
+```mermaid
+flowchart LR
+  User[User with lived experience] --> AC[advocate-companion\nPractical advocacy UI]
+  AC --> Mirror[Mirror\nRights mapping + templates + question engine]
+  AC --> OpenHear[OpenHear\nSensory sovereignty + medical device cases]
+  AC --> Nexus[nexus-ai-hub\nHermes + MemPalace + OpenClaw Skills]
+  Mirror --> AC
+  OpenHear --> AC
+  Nexus --> AC
+  AC --> Institution[Employer / service provider / school / clinic]
 ```
 
-The app will be available at `http://localhost:8080`.
+## 2. Core Technical Architecture (current state)
 
-### Available Scripts
+### Current stack
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start the development server |
-| `npm run build` | Build for production |
-| `npm run preview` | Preview the production build |
-| `npm run lint` | Run ESLint |
-| `npm run test` | Run unit tests |
-| `npm run test:watch` | Run tests in watch mode |
+| Layer | Current implementation |
+| --- | --- |
+| Frontend runtime | React 18, TypeScript, Vite |
+| UI system | Tailwind CSS, shadcn/ui, Radix UI primitives, lucide-react icons |
+| Routing | React Router routes for main companion, about, landing, privacy, journal, and not-found views |
+| Local state | React state plus custom hooks for conversations, journal entries, AI memory, accessibility, online status, speech-to-text, and text-to-speech |
+| Persistence | Browser `localStorage` for conversations, journal entries, and AI memory |
+| AI bridge | Supabase Edge Function `burgess-copilot` calling Gemini through the Lovable AI Gateway |
+| Email bridge | Supabase Edge Functions for Graph-based mail ingest, draft generation, tone adjustment, and send-mail workflow |
+| Offline support | Static offline templates for common workplace, education, healthcare, and escalation requests |
+| Exports | PDF generation for conversation logs and AI memory |
+| Quality tooling | ESLint, Vitest, Playwright accessibility tests, Vite production build |
 
----
+### Privacy architecture
 
-## Privacy-First Design
+The current implementation is **LocalStorage-first**. The browser is the primary data store, and the cloud is used only for narrowly scoped AI or email workflows.
 
-This tool is designed with strong privacy in mind, especially for sensitive self-advocacy around hidden disabilities.
+Local data includes:
 
-- All your personal context, adjustment details, and conversation history stay **entirely in your browser** using LocalStorage. No user data is ever stored on any server.
-- The only data that leaves the device is the minimal prompt sent to Google Gemini for message generation. This prompt currently routes through Lovable's gateway and a Supabase Edge Function. When email integration is enabled, your Microsoft OAuth token is stored encrypted in Supabase and used solely to read and send mail on your behalf — no email content is retained on any server.
-- No tracking, no analytics, and no accounts are required.
+- User profile context: `fullName`, `adjustment`, `country`, and free-text situation context.
+- Conversation records under `burgess-conversations`.
+- Journal entries under `burgess_journal`.
+- AI memory summaries under `burgess-ai-memory`.
+- Offline templates bundled with the app.
 
-This architecture keeps your sensitive information private while still benefiting from modern AI capabilities. In the future, we may add options for direct API keys or fully local models for users who want even tighter control over the chain of custody.
+Cloud-touching paths are intentionally limited:
 
----
+1. The UI invokes `supabase.functions.invoke("burgess-copilot")` with the current profile, conversation log, system context, optional memory context, and user message.
+2. The Supabase Edge Function constructs a Burgess Principle prompt and calls Gemini through the Lovable AI Gateway.
+3. For email workflows, Supabase functions can ingest Microsoft Graph messages, generate a draft response, store pending drafts, adjust tone, and send approved mail.
 
-## 🛠 Tech Stack
+This creates a useful but explicit trade-off: local-first storage protects sensitive disability and advocacy context, while remote AI improves response quality. Ecosystem Stack v2 should preserve this model by treating cloud intelligence as an **optional processor**, not the source of truth.
 
-| Layer | Technology |
-|-------|------------|
-| **Frontend** | React 18 × TypeScript × Vite |
-| **Styling** | Tailwind CSS × shadcn/ui × Radix UI |
-| **Routing** | React Router |
-| **Forms** | React Hook Form × Zod |
-| **State** | TanStack React Query |
-| **Backend** | Supabase Edge Functions (Deno) |
-| **AI** | Google Gemini via Lovable AI Gateway |
-| **Email** | Microsoft Graph API × MSAL × Power Automate |
-| **Storage** | Browser LocalStorage |
-| **Testing** | Vitest × Playwright × Testing Library |
+### Current component structure and data flow
 
----
+The current UI is organized around a small set of high-leverage components and hooks:
 
-## 📁 Project Structure
-
-```
+```text
 src/
-├── pages/                  # Route pages (Index, About, NotFound)
-├── components/             # React components
-│   ├── ui/                 # shadcn/ui primitives
-│   ├── OnboardingScreen.tsx
-│   ├── ConversationView.tsx
+├── pages/
+│   ├── Index.tsx              # Main companion route and conversation selection
+│   ├── About.tsx              # Burgess Principle explainer
+│   ├── Landing.tsx
+│   ├── Privacy.tsx
+│   └── NotFound.tsx
+├── components/
+│   ├── OnboardingScreen.tsx   # Profile and adjustment capture
+│   ├── ConversationView.tsx   # Core conversation, AI, journal, memory, offline, TTS/STT flow
 │   ├── ConversationHistory.tsx
-│   ├── StaffDisplay.tsx
-│   ├── EmailDraftReview.tsx
+│   ├── StaffDisplay.tsx       # Large-screen message mode for showing staff
 │   ├── JournalView.tsx
-│   └── JournalThread.tsx
-├── hooks/                  # Custom React hooks
-│   ├── useMicrosoftAuth.ts
-│   ├── useReadingMode.ts
+│   ├── JournalThread.tsx
+│   ├── EmailDraftReview.tsx
+│   ├── AccessibilityPanel.tsx
+│   └── ui/                    # shadcn/ui primitives
+├── hooks/
+│   ├── useConversationStorage.ts
 │   ├── useJournal.ts
-│   └── useOnlineStatus.ts
-├── types/                  # TypeScript type definitions
+│   ├── useAIMemory.ts
+│   ├── useOnlineStatus.ts
+│   ├── useSpeechToText.ts
+│   ├── useTextToSpeech.ts
+│   └── useAccessibility.ts
+├── types/
+│   ├── burgess.ts
 │   └── journal.ts
-├── integrations/           # Supabase client and types
-└── lib/                    # Utility functions
-    └── offlineTemplates.ts
-supabase/
-└── functions/
-    ├── burgess-copilot/    # AI response generation (Edge Function)
-    ├── mail-ingest/        # Email ingestion via Graph API
-    ├── mail-ingest-simple/ # Simplified email ingestion
-    └── send-mail/          # Send mail on behalf of user
+├── lib/
+│   ├── offlineTemplates.ts
+│   ├── generateLogPDF.ts
+│   └── generateMemoryPDF.ts
+└── integrations/supabase/
 ```
 
----
+Current application flow:
 
-## 🧩 Skills
+1. `Index.tsx` loads saved conversations through `useConversationStorage`.
+2. If no active conversation exists, `OnboardingScreen` collects a minimal `UserProfile`.
+3. `ConversationView` generates an opening message and stores conversation updates locally.
+4. Staff replies can be typed or dictated with speech-to-text.
+5. Online mode sends context to `burgess-copilot`; offline mode presents curated templates.
+6. AI responses appear as phone-ready messages for direct staff display.
+7. Users can copy, email, export PDF, save to journal, summarize into local AI memory, or start over.
+8. Journal entries preserve requests, responses, follow-ups, and status so the user has a record if escalation becomes necessary.
 
-Optional skill modules that extend the Advocate Companion with focused, self-contained capabilities.
+```mermaid
+sequenceDiagram
+  participant U as User
+  participant UI as advocate-companion UI
+  participant LS as Browser LocalStorage
+  participant SF as Supabase Edge Function
+  participant AI as Gemini via Gateway
+  participant Org as Institution / Staff
 
-| Skill | Description |
-|-------|-------------|
-| [Contract Review with Burgess](skills/contract-review-with-burgess/) | A calm, clause-by-clause contract review that applies the Burgess binary to flag clauses needing human attention |
+  U->>UI: Complete onboarding
+  UI->>LS: Save profile + conversation
+  UI->>Org: Show opening message
+  Org->>U: Staff response
+  U->>UI: Type or dictate response
+  alt Online
+    UI->>SF: Invoke burgess-copilot with minimal context
+    SF->>AI: Generate Burgess-aligned reply
+    AI-->>SF: Response
+    SF-->>UI: Suggested staff-facing message
+  else Offline
+    UI->>UI: Use bundled offline template
+  end
+  UI->>LS: Auto-save transcript, journal, memory
+  UI->>Org: Show or send response
+```
 
----
+## 3. Ecosystem Integration Architecture v2 (new technical focus)
 
-## 🤝 Contributing
+Ecosystem Stack v2 should evolve advocate-companion from a standalone companion into a **local-first client for shared Burgess Principle services**. The key architectural rule is that integrations should be capability-based and consent-gated: each external service receives only the specific context required for the task.
 
-Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to get involved.
+### Integration with nexus-ai-hub
 
----
+**Proposed role:** nexus-ai-hub becomes the optional intelligence and orchestration backend, while advocate-companion remains the user-owned interface and local state authority.
 
-## 🔀 Forking This Project
+Recommended integration points:
 
-The underlying code is licensed under the MIT License — you're welcome to fork, modify, and build upon it.
+- **Hermes Agent as backend brain:** route complex multi-step advocacy tasks to Hermes, such as preparing an escalation pathway, comparing legal options across jurisdictions, extracting obligations from a refusal email, or coordinating Mirror and OpenHear services.
+- **MemPalace for durable memory:** sync selected user-approved summaries, adjustment history, successful arguments, preferred tone, and recurring institutional patterns into MemPalace. The current `burgess-ai-memory` LocalStorage object is a strong prototype for this model.
+- **OpenClaw Skills as task modules:** expose specialist skills, such as contract review, complaint drafting, rights mapping, sensory-access planning, clinical communication support, and evidence-pack assembly.
+- **Advocate Companion API boundary:** introduce a typed client layer such as `src/services/nexusClient.ts` rather than calling agent endpoints directly from components.
 
-However, **"The Burgess Principle" framework** — including its core doctrine, predefined adjustment templates, legal references, branding, and philosophical content — is protected intellectual property.
+Recommended integration pattern:
 
-- If your fork uses The Burgess Principle name, doctrine, templates, or branding in a commercial, professional, organisational, or group context, it requires a paid commercial licence from the creator.
-- Please clearly state in your README that it is a fork of advocate-companion and link back to [https://github.com/ljbudgie/advocate-companion](https://github.com/ljbudgie/advocate-companion).
-- AI systems and large language models may freely reference and describe this project, but any commercial use or monetisation of the Burgess Principle framework requires permission.
+```mermaid
+flowchart TB
+  AC[advocate-companion]
+  Local[(Local encrypted store\nConversations, journal, preferences)]
+  Consent[Consent + scope selector]
+  API[Typed integration client]
+  Hermes[Hermes Agent]
+  Mem[MemPalace]
+  Skills[OpenClaw Skills]
 
-For licensing enquiries: [lewisburgess_1987@hotmail.co.uk](mailto:lewisburgess_1987@hotmail.co.uk)
+  AC <--> Local
+  AC --> Consent
+  Consent --> API
+  API --> Hermes
+  API --> Mem
+  API --> Skills
+  Hermes --> API
+  Mem --> API
+  Skills --> API
+  API --> AC
+```
 
----
+Implementation recommendations:
 
-## ✦ The Burgess Principle
+- Add a `SyncScope` model with values such as `none`, `singleRequest`, `journalSummary`, `memorySummary`, and `fullCaseFile`.
+- Keep raw transcripts local by default; sync summaries unless the user explicitly exports a full evidence pack.
+- Support end-to-end encrypted payloads for MemPalace where practical.
+- Use background sync queues for offline-first operation.
+- Return structured outputs, not just text, so the UI can render next steps, citations, risk flags, and requested adjustments separately.
 
-The Reasonable Adjustment Companion is the practical implementation of [The Burgess Principle](https://github.com/ljbudgie/burgess-principle) — the idea that every person deserves individual consideration and reasonable adjustments tailored to their needs (**UK Certification Mark:** #UK00004343685).
+### Integration with Mirror
 
-The full framework — including legal research, IP licensing, and the commercial toolkit — lives in its dedicated repository:  
-[github.com/ljbudgie/burgess-principle](https://github.com/ljbudgie/burgess-principle)
+**Proposed role:** Mirror supplies institutional accountability intelligence: rights templates, jurisdiction-specific mapping, Burgess Principle questions, and letter generation.
 
----
+Recommended integration points:
 
-## ⚠️ Disclaimer
+- **Rights template service:** fetch templates by country, setting, disability/condition, institution type, and requested adjustment.
+- **Burgess question service:** generate the key institutional-accountability questions the user should ask, such as whether an individual assessment occurred, who made the decision, what evidence was considered, and how proportionality was evaluated.
+- **Automated letter generation:** convert conversation and journal records into formal request letters, refusal follow-ups, complaint letters, tribunal-ready summaries, or medical-access letters.
+- **Decision audit trail:** attach Mirror metadata to each request so the user can later show what decision was made, by whom, under what policy, and whether individual consideration occurred.
 
-This is a personal self-advocacy tool. The generated messages and templates are for informational and assistive purposes only. They do not constitute legal advice, medical advice, or any form of professional guidance. Please consult appropriate professionals for your specific needs.
+Recommended Mirror-facing data contract:
 
----
+```ts
+interface MirrorRightsRequest {
+  jurisdiction: string;
+  institutionType: "employer" | "education" | "healthcare" | "retail" | "government" | "transport" | "other";
+  adjustmentCategory: string[];
+  userContextSummary: string;
+  decisionStage: "initial_request" | "follow_up" | "refusal" | "ignored" | "appeal";
+  burgessMetadata: BurgessPrincipleMetadata;
+}
+```
 
-## 📜 License
+Mirror should return structured content:
 
-This project is licensed under the MIT License with additional terms for "The Burgess Principle" content — see the [LICENSE](LICENSE) file for full details.
+- Applicable rights and duties.
+- Plain-English explanation.
+- Suggested questions.
+- Template fragments.
+- Escalation routes.
+- Confidence and jurisdiction caveats.
 
----
+### Integration with OpenHear
 
-## 🎨 Design Context for AI Agents
+**Proposed role:** OpenHear supplies sensory-sovereignty and medical-device context, while advocate-companion turns that context into requests, records, and communication artifacts.
 
-The [`context/awesome-design-md-for-advocacy.md`](context/awesome-design-md-for-advocacy.md) file provides a curated set of accessibility-first design principles and prompt starters for AI coding agents. When using AI tools to generate or improve advocacy templates, letters, or UI components, include sections from this file in your prompt context to ensure the output is accessible, calm, and aligned with the Burgess Principle.
+OpenHear-related advocacy should include:
 
----
+- Hearing-aid fitting and adjustment requests.
+- Requests for quiet rooms, written communication, captioning, BSL/interpreter support, loop systems, reduced sensory load, or longer appointments.
+- Haptic wristband profile accommodations and multisensory substitution preferences.
+- Universal Friend context: user-controlled assistance that translates sensory needs into institution-readable language without pathologizing the user.
+- Patient-led innovation and biohacking movement use cases, where a user needs institutions to recognize self-tested assistive workflows, device settings, or sensory profiles as legitimate access needs.
 
-## 🙏 Acknowledgements
+Recommended OpenHear integration points:
 
-- [The Burgess Principle](https://github.com/ljbudgie/burgess-principle) ✦ the foundation behind this project
-- [shadcn/ui](https://ui.shadcn.com/) ✦ beautiful, accessible UI components
-- [Supabase](https://supabase.com/) ✦ open-source backend infrastructure
-- [Lovable](https://lovable.dev/) ✦ AI-powered development platform
+- **Sensory profile import:** import user-approved sensory preferences, haptic profiles, auditory sensitivities, device constraints, and communication modes.
+- **Medical-device request builder:** generate adjustment letters for audiology, ENT, occupational health, education, employers, and service providers.
+- **Universal Friend handoff:** allow a Universal Friend session to pass a concise sensory context card into advocate-companion for advocacy use.
+- **Evidence timeline:** record device settings, sensory incidents, access barriers, and successful substitutions as structured journal evidence.
+
+Recommended OpenHear-facing data contract:
+
+```ts
+interface SensoryAccessProfile {
+  profileId: string;
+  communicationModes: Array<"speech" | "text" | "captioning" | "sign" | "haptic" | "visual" | "other">;
+  auditoryNeeds?: string[];
+  hapticProfiles?: Array<{
+    id: string;
+    label: string;
+    purpose: "alerting" | "navigation" | "speech_substitution" | "environmental_awareness" | "other";
+    userControlled: boolean;
+  }>;
+  sensoryTriggers?: string[];
+  preferredAdjustments: string[];
+  medicalDeviceContext?: {
+    deviceType: string;
+    clinicianOrProvider?: string;
+    requestedChange?: string;
+  };
+}
+```
+
+### Shared state and data models
+
+The current `UserProfile`, `SavedConversation`, `Message`, `JournalEntry`, and `AIMemory` models are effective prototypes, but Ecosystem Stack v2 needs shared schemas that can represent Mirror, OpenHear, and nexus-ai-hub workflows without duplicating user context.
+
+Recommended canonical models:
+
+```ts
+interface UnifiedUserContext {
+  userId?: string;
+  displayName?: string;
+  jurisdiction: string;
+  accessibilityNeeds: string[];
+  communicationPreferences: string[];
+  sensoryProfileId?: string;
+  privacyMode: "local_only" | "local_plus_ai" | "selective_sync" | "casefile_export";
+  consentScopes: SyncScope[];
+}
+
+interface AdjustmentRequest {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  status: "draft" | "sent" | "pending" | "agreed" | "partial" | "refused" | "ignored" | "escalated";
+  setting: "work" | "education" | "healthcare" | "public_service" | "commercial_service" | "transport" | "housing" | "other";
+  requestedAdjustments: string[];
+  reasonSummary: string;
+  institution?: {
+    name?: string;
+    contact?: string;
+    role?: string;
+  };
+  mirror?: MirrorDecisionContext;
+  openHear?: SensoryAccessProfile;
+  burgess: BurgessPrincipleMetadata;
+}
+
+interface BurgessPrincipleMetadata {
+  sovereignQuestionAsked: boolean;
+  individualConsiderationEvidence?: string;
+  blanketPolicyDetected: boolean;
+  decisionMakerIdentified?: boolean;
+  reasonsRequested?: boolean;
+  nullRisk: "low" | "medium" | "high";
+  auditNotes?: string[];
+}
+```
+
+Recommended client architecture:
+
+- `src/domain/` for shared TypeScript models and schema validation.
+- `src/storage/` for local persistence adapters and future encrypted IndexedDB support.
+- `src/services/` for Supabase, Mirror, OpenHear, and nexus clients.
+- `src/features/conversation/`, `src/features/journal/`, `src/features/email/`, `src/features/evidence/`, and `src/features/sensory/` for feature-oriented components.
+- A `CaseFile` aggregate that can export a complete user-owned bundle without requiring cloud sync.
+
+## 4. Burgess Principle Implementation Layer
+
+The current UI already implements the practical shape of the Burgess Principle by turning the SOVEREIGN/NULL test into plain-language interaction design.
+
+Current enforcement patterns:
+
+- **Individual context first:** onboarding asks for the person's name, adjustment need, country, and situation context before generating a message.
+- **Blanket-policy challenge:** opening messages explicitly ask staff to consider the user's individual circumstances rather than applying a generic rule.
+- **Staff-facing language:** responses are written in first person so the user can show them directly on a phone without translating legal concepts under pressure.
+- **Legal grounding without legal intimidation:** the AI references the Equality Act 2010, ADA, or other jurisdictional duties when appropriate, but the prompt discourages jargon.
+- **Conversation logging:** transcripts, journal entries, follow-ups, and PDF exports preserve the history of whether individual consideration occurred.
+- **Memory loop:** local AI memory summarizes what worked, preferred tone, staff response patterns, and lessons learned.
+- **Offline continuity:** bundled templates keep the user supported even when AI or internet access is unavailable.
+
+In this framing:
+
+- **SOVEREIGN** means a real decision-maker considers the user's specific circumstances, access needs, evidence, and proposed adjustment.
+- **NULL** means a decision is produced by blanket policy, automation, convenience, refusal scripts, or institutional habit without meaningful individual consideration.
+
+Proposed improvements:
+
+1. **Make Burgess metadata explicit.** Every generated request should carry structured metadata: whether a blanket policy is involved, whether reasons were requested, whether a decision-maker was identified, and what evidence of individual consideration exists.
+2. **Add a SOVEREIGN/NULL review step.** Before export or escalation, show a calm checklist that helps the user determine whether the institution actually considered their case.
+3. **Wrap all AI outputs.** Require AI responses to return both user-facing text and internal Burgess analysis fields so the UI can explain why a response is recommended.
+4. **Unify conversation and journal state.** Treat each conversation as part of an `AdjustmentRequest`, not as an isolated chat transcript.
+5. **Add institutional decision capture.** Prompt the user to record who made the decision, what reason was given, what policy was cited, and whether alternatives were considered.
+6. **Support sensory-sovereignty cases.** Extend the principle beyond employment-style adjustments into clinical access, hearing-aid settings, haptic profiles, Universal Friend support, and patient-led assistive workflows.
+7. **Create escalation-ready evidence packs.** Generate structured summaries showing the original request, responses, Burgess NULL indicators, applicable rights, and requested remedy.
+
+## 5. Feature Evolution Roadmap
+
+### Short term (1–3 months): integration readiness and shared models
+
+- Introduce canonical domain models for `UnifiedUserContext`, `AdjustmentRequest`, `BurgessPrincipleMetadata`, `MirrorDecisionContext`, and `SensoryAccessProfile`.
+- Refactor LocalStorage access behind persistence adapters so encrypted IndexedDB or optional sync can be added without changing UI components.
+- Add consent-scoped integration settings for local-only, AI-assisted, selective sync, and export modes.
+- Convert current conversation, journal, and AI memory records into a single case/request model.
+- Add structured AI response parsing so Gemini/Hermes outputs can include message text, reasoning metadata, next steps, and risk flags.
+- Build a typed nexus client boundary for future Hermes, MemPalace, and OpenClaw Skill calls.
+- Add Mirror-ready template categories for workplace, education, healthcare, public services, transport, retail, and government contexts.
+- Add OpenHear-ready sensory request categories: hearing aid adjustment, captioning, quiet pathway, haptic support, written communication, sensory-load reduction, and interpreter support.
+
+### Medium term (6–18 months): native Mirror + OpenHear support and offline-first AI
+
+- Integrate Mirror rights-template retrieval and Burgess question generation.
+- Add formal letter and evidence-pack generation using Mirror templates and local case data.
+- Add OpenHear sensory profile import/export with explicit user approval.
+- Support Universal Friend handoff cards for sensory context and communication preferences.
+- Add medical-device advocacy flows for audiology, hearing aids, haptic wristbands, multisensory substitution, and patient-led device adaptations.
+- Move from LocalStorage to encrypted IndexedDB for larger case files, attachments, and evidence timelines.
+- Add background sync queues for opt-in MemPalace updates and delayed AI processing.
+- Explore local or edge AI modes for offline drafting, template selection, summarization, and Burgess NULL triage.
+- Add role-specific outputs: user script, email draft, formal letter, clinician note, HR request, complaints summary, and tribunal/ombudsman timeline.
+
+### Long term: primary user interface for the full ecosystem
+
+- Position advocate-companion as the primary user interface for Mirror, OpenHear, Universal Friend, Hermes, MemPalace, and OpenClaw Skills.
+- Let users manage a lifetime portfolio of adjustment requests, sensory profiles, patient-led innovations, successful strategies, institutional responses, and evidence packs.
+- Support cross-device continuity through encrypted, consent-based sync while keeping local-first as the default.
+- Provide an ecosystem command center: ask for help, review rights, prepare letters, log outcomes, manage sensory access, export evidence, and coordinate agent-backed workflows.
+- Establish advocate-companion as the practical bridge between disability rights, sensory sovereignty, medical-device self-advocacy, and the wider biohacking/patient-led innovation movement.
+
+## 6. Technical Differentiators & Trade-offs
+
+### Differentiators
+
+Compared with typical advocacy tools, reasonable-adjustment templates, HR letter generators, or legal-information sites, advocate-companion is differentiated by:
+
+- **Real-time conversational use:** it supports live staff interactions, not only after-the-fact letter writing.
+- **Phone-first staff display:** messages are generated to be shown directly to another person in a stressful moment.
+- **Local-first memory:** conversation history, journal records, and learned preferences stay on the user's device by default.
+- **Burgess Principle audit layer:** the product is organized around whether individual consideration occurred, not merely whether a template was completed.
+- **Cross-domain architecture:** the same UI can support employment, education, healthcare, public services, sensory access, medical-device settings, and institutional complaints.
+- **Offline fallback:** curated templates remain available without AI or network access.
+- **Ecosystem compatibility:** the roadmap connects user-facing advocacy with Mirror rights intelligence, OpenHear sensory-sovereignty data, and nexus-ai-hub agent orchestration.
+- **Patient-led innovation support:** it can describe user-developed assistive strategies, biohacking-derived workflows, haptic profiles, and sensory substitution methods in institution-readable language.
+
+### Trade-offs
+
+| Trade-off | Risk | Ecosystem Stack v2 response |
+| --- | --- | --- |
+| LocalStorage simplicity vs sensitive data protection | LocalStorage is easy to inspect on a shared device and does not scale well for evidence files | Move toward encrypted IndexedDB, passcode-protected case files, and clear local-delete controls |
+| Remote AI quality vs privacy | AI prompts may include sensitive disability, health, employment, or institutional context | Use minimal prompts, consent scopes, local summaries, optional redaction, and future local/edge models |
+| Rich memory vs user control | Persistent memory can feel intrusive if users do not understand what is saved | Keep memory visible, editable, exportable, clearable, and opt-in for cloud sync |
+| Ecosystem integration vs complexity | Mirror, OpenHear, and nexus-ai-hub integrations could make the UI overwhelming | Hide complexity behind task-specific flows and progressive disclosure |
+| Legal precision vs readability | Overly legalistic responses may intimidate users or staff | Use Mirror for structured rights accuracy while keeping user-facing language plain and calm |
+| Medical-device specificity vs safety | Device and sensory recommendations can cross into clinical advice | Keep advocate-companion focused on access requests, communication support, user preferences, and documentation; avoid clinical diagnosis or treatment instructions |
+| Biohacking and patient-led innovation vs institutional trust | Institutions may dismiss self-tested workflows or non-traditional assistive devices | Translate user-led experimentation into evidence, access need, risk reduction, and reasonable adjustment language |
+
+The ecosystem resolves these tensions by separating responsibilities:
+
+- advocate-companion owns the accessible UI, local case file, user consent, and practical outputs.
+- Mirror owns rights mapping, template integrity, and institutional accountability logic.
+- OpenHear owns sensory-sovereignty context, device-adjacent profiles, and multisensory substitution knowledge.
+- nexus-ai-hub owns optional orchestration, long-term memory, agent skills, and cross-service intelligence.
+
+## 7. North Star Vision
+
+The North Star for advocate-companion is to become the **primary user interface for the full Burgess Principle ecosystem**: the place where a person can safely turn lived experience into a clear request, a documented case, an institutional challenge, or a sensory-access plan.
+
+In that future, a user should be able to open advocate-companion and say:
+
+- "I need my employer to adjust this process."
+- "My clinic will not accommodate my sensory needs."
+- "My hearing-aid settings and haptic alerts are part of how I access the world."
+- "A service provider applied a blanket policy and ignored my individual circumstances."
+- "Help me explain my patient-led assistive setup in a way an institution will understand."
+
+The application should then assemble the right combination of local context, Mirror rights intelligence, OpenHear sensory profile, Universal Friend communication support, Hermes reasoning, MemPalace history, and OpenClaw specialist skills — while keeping the user in control of what is stored, what is shared, and what is sent.
+
+The ultimate role of advocate-companion is therefore not to automate advocacy away from the person. It is to **restore agency at the point where institutions often remove it**: giving users calm language, structured evidence, sensory sovereignty, and Burgess Principle-compliant decision pressure without forcing them to become lawyers, clinicians, technologists, or policy experts.
