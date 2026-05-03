@@ -201,15 +201,19 @@ Recommended integration points:
 Recommended Mirror-facing data contract:
 
 ```ts
-interface MirrorRightsRequest {
+type StandardInstitutionType = "employer" | "education" | "healthcare" | "retail" | "government" | "transport" | "housing";
+
+type MirrorInstitution =
+  | { institutionType: StandardInstitutionType; customInstitutionType?: never }
+  | { institutionType: "other"; customInstitutionType: string };
+
+type MirrorRightsRequest = MirrorInstitution & {
   jurisdiction: string;
-  institutionType: "employer" | "education" | "healthcare" | "retail" | "government" | "transport" | "housing" | "other";
-  customInstitutionType?: string; // validation should require this when institutionType is "other"
   adjustmentCategory: string[];
   userContextSummary: string;
   decisionStage: "initial_request" | "follow_up" | "refusal" | "ignored" | "appeal";
   burgessMetadata: BurgessPrincipleMetadata;
-}
+};
 ```
 
 Mirror should return structured content:
@@ -246,7 +250,11 @@ Recommended OpenHear-facing data contract:
 interface SensoryAccessProfile {
   profileId: string;
   communicationModes: Array<"speech" | "text" | "captioning" | "sign" | "haptic" | "visual" | "other">;
-  customCommunicationModes?: string[]; // user-defined or experimental modes awaiting schema standardization
+  customCommunicationModes?: Array<{
+    mode: string;
+    description: string;
+    experimental: boolean;
+  }>;
   auditoryNeeds?: string[];
   hapticProfiles?: Array<{
     id: string;
@@ -279,10 +287,10 @@ interface UnifiedUserContext {
   communicationPreferences: string[];
   sensoryProfileId?: string;
   privacyMode:
-    | "local_only"      // no network processing; offline templates and local exports only
+    | "local_only"      // no network or ecosystem processing; local templates and local storage only
     | "local_plus_ai"   // minimal prompt sent for AI generation; source records stay local
-    | "selective_sync"  // user-approved summaries or fields sync to ecosystem services
-    | "local_with_export"; // local-only operation with user-controlled evidence bundle export; no automatic sync
+    | "selective_sync"; // user-approved summaries or fields sync to ecosystem services
+  exportPolicy: "disabled" | "manual_casefile"; // explicit export capability, independent of sync mode
   consentScopes: SyncScope[];
 }
 
@@ -310,7 +318,7 @@ interface BurgessPrincipleMetadata {
   blanketPolicyDetected: boolean;
   decisionMakerIdentified?: boolean;
   reasonsRequested?: boolean;
-  blanketPolicyRisk: "low" | "medium" | "high"; // risk that the institution is applying a Burgess NULL blanket policy
+  nullDecisionRisk: "low" | "medium" | "high"; // likelihood that the institution is applying a Burgess NULL blanket policy
   auditNotes?: string[];
 }
 ```
