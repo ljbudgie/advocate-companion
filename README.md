@@ -2,7 +2,7 @@
 
 ## 1. Identity & Role in the Ecosystem
 
-**advocate-companion** is the practical advocacy UI layer of the Burgess Principle ecosystem: a privacy-first React/TypeScript web application that helps people with hidden disabilities, sensory access needs, chronic conditions, neurodivergence, and other individual circumstances request reasonable adjustments or accommodations in clear, calm, evidence-aware language.
+**advocate-companion** is the practical advocacy UI layer of the Burgess Principle ecosystem: a privacy-first React/TypeScript web application that helps people with hidden disabilities, sensory access needs, chronic conditions, neurodivergence, and other individual circumstances request reasonable adjustments or accommodations in clear, calm, evidence-aware language. This document uses `advocate-companion` for the repository/product module and **Advocate Companion** when describing the user-facing experience.
 
 Its role is deliberately user-facing. Where the wider ecosystem contains institutional reasoning engines, sensory-sovereignty research, and central agent infrastructure, advocate-companion is the screen a person can actually use during a stressful interaction: at a reception desk, in an HR conversation, in a healthcare appointment, while replying to an email, or when documenting a refusal.
 
@@ -45,7 +45,7 @@ flowchart LR
 
 ### Privacy architecture
 
-The current implementation is **LocalStorage-first**. The browser is the primary data store, and the cloud is used only for narrowly scoped AI or email workflows.
+The current implementation is **LocalStorage-first**. The browser is the primary data store, and the cloud is used only for narrowly scoped AI or email workflows. Because disability, health, employment, and sensory-access data is sensitive, this is a pragmatic current-state baseline rather than the final security posture: Ecosystem Stack v2 should move short-term storage to encrypted IndexedDB/passcode-protected case files while preserving local-first ownership.
 
 Local data includes:
 
@@ -203,7 +203,7 @@ Recommended Mirror-facing data contract:
 ```ts
 interface MirrorRightsRequest {
   jurisdiction: string;
-  institutionType: "employer" | "education" | "healthcare" | "retail" | "government" | "transport" | "other";
+  institutionType: "employer" | "education" | "healthcare" | "retail" | "government" | "transport" | "housing" | "other";
   adjustmentCategory: string[];
   userContextSummary: string;
   decisionStage: "initial_request" | "follow_up" | "refusal" | "ignored" | "appeal";
@@ -276,7 +276,11 @@ interface UnifiedUserContext {
   accessibilityNeeds: string[];
   communicationPreferences: string[];
   sensoryProfileId?: string;
-  privacyMode: "local_only" | "local_plus_ai" | "selective_sync" | "casefile_export";
+  privacyMode:
+    | "local_only"      // no network processing; offline templates and local exports only
+    | "local_plus_ai"   // minimal prompt sent for AI generation; source records stay local
+    | "selective_sync"  // user-approved summaries or fields sync to ecosystem services
+    | "casefile_export"; // user-initiated evidence bundle export, not automatic sync
   consentScopes: SyncScope[];
 }
 
@@ -304,9 +308,27 @@ interface BurgessPrincipleMetadata {
   blanketPolicyDetected: boolean;
   decisionMakerIdentified?: boolean;
   reasonsRequested?: boolean;
-  nullRisk: "low" | "medium" | "high";
+  individualConsiderationRisk: "low" | "medium" | "high"; // risk that the decision is Burgess NULL: blanket policy without meaningful individual consideration
   auditNotes?: string[];
 }
+```
+
+Recommended request lifecycle:
+
+```mermaid
+stateDiagram-v2
+  [*] --> draft
+  draft --> sent
+  sent --> pending
+  pending --> agreed
+  pending --> partial
+  pending --> refused
+  pending --> ignored
+  partial --> escalated
+  refused --> escalated
+  ignored --> escalated
+  escalated --> agreed
+  escalated --> partial
 ```
 
 Recommended client architecture:
@@ -345,6 +367,7 @@ Proposed improvements:
 5. **Add institutional decision capture.** Prompt the user to record who made the decision, what reason was given, what policy was cited, and whether alternatives were considered.
 6. **Support sensory-sovereignty cases.** Extend the principle beyond employment-style adjustments into clinical access, hearing-aid settings, haptic profiles, Universal Friend support, and patient-led assistive workflows.
 7. **Create escalation-ready evidence packs.** Generate structured summaries showing the original request, responses, Burgess NULL indicators, applicable rights, and requested remedy.
+8. **Add safety guardrails for medical-device contexts.** Keep prompts and UI labels focused on access barriers, communication preferences, device-setting history, and user-requested adjustments; block diagnosis/treatment phrasing, show clinical-safety disclaimers, and route clinical decisions back to qualified professionals.
 
 ## 5. Feature Evolution Roadmap
 
@@ -403,7 +426,7 @@ Compared with typical advocacy tools, reasonable-adjustment templates, HR letter
 | Rich memory vs user control | Persistent memory can feel intrusive if users do not understand what is saved | Keep memory visible, editable, exportable, clearable, and opt-in for cloud sync |
 | Ecosystem integration vs complexity | Mirror, OpenHear, and nexus-ai-hub integrations could make the UI overwhelming | Hide complexity behind task-specific flows and progressive disclosure |
 | Legal precision vs readability | Overly legalistic responses may intimidate users or staff | Use Mirror for structured rights accuracy while keeping user-facing language plain and calm |
-| Medical-device specificity vs safety | Device and sensory recommendations can cross into clinical advice | Keep advocate-companion focused on access requests, communication support, user preferences, and documentation; avoid clinical diagnosis or treatment instructions |
+| Medical-device specificity vs safety | Device and sensory recommendations can cross into clinical advice | Enforce prompt and UI guardrails: describe user needs, device context, access barriers, and requested accommodations; avoid diagnosis, treatment plans, dosage-style instructions, or clinician substitution |
 | Biohacking and patient-led innovation vs institutional trust | Institutions may dismiss self-tested workflows or non-traditional assistive devices | Translate user-led experimentation into evidence, access need, risk reduction, and reasonable adjustment language |
 
 The ecosystem resolves these tensions by separating responsibilities:
