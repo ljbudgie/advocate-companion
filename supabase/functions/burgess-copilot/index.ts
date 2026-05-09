@@ -81,7 +81,7 @@ Keep each field concise (1-2 sentences max). If a field isn't applicable, use an
     }
 
     // Default: conversation mode
-    const { systemContext, userMessage, profile, conversationLog, memoryContext } = body;
+    const { systemContext, userMessage, profile, conversationLog, memoryContext, responseFormat } = body;
 
     const systemPrompt = `You are a calm, professional advocacy co-pilot helping people assert their right to be treated as individuals — not as a policy number.
 
@@ -109,6 +109,7 @@ GUIDELINES:
 9. If asked to adjust tone: "firmer" means more direct about consequences; "polite" means softer but still asserting rights.
 10. Keep responses concise — they will be displayed on a phone screen. Use markdown bold for key phrases only.
 11. If memory from previous conversations is available, use it to build on what worked before and avoid repeating unsuccessful approaches.
+12. When structured output is requested, return only valid JSON with messageText, burgess, nextSteps, riskFlags, and citations fields.
 
 ADDITIONAL CONTEXT: ${systemContext}
 
@@ -125,7 +126,30 @@ ${(conversationLog || []).map((m: { role: string; content: string }) => `${m.rol
         model: "google/gemini-3-flash-preview",
         messages: [
           { role: "system", content: systemPrompt },
-          { role: "user", content: userMessage },
+          {
+            role: "user",
+            content: responseFormat === "structured"
+              ? `${userMessage}
+
+Return only JSON in this shape:
+{
+  "messageText": "the exact message the user can show to staff",
+  "burgess": {
+    "sovereignQuestionAsked": true,
+    "individualConsiderationEvidence": "",
+    "blanketPolicyDetected": false,
+    "decisionMakerIdentified": false,
+    "reasonsRequested": false,
+    "alternativesConsidered": false,
+    "blanketPolicyLikelihood": "low",
+    "auditNotes": []
+  },
+  "nextSteps": [],
+  "riskFlags": [],
+  "citations": []
+}`
+              : userMessage,
+          },
         ],
       }),
     });
@@ -148,6 +172,20 @@ ${(conversationLog || []).map((m: { role: string; content: string }) => `${m.rol
 
     const data = await response.json();
     const content = data.choices?.[0]?.message?.content || "Unable to generate a response.";
+
+    if (responseFormat === "structured") {
+      const cleaned = content.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+      try {
+        const structured = JSON.parse(cleaned);
+        return new Response(JSON.stringify({ structured, response: structured.messageText || content }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      } catch {
+        return new Response(JSON.stringify({ response: content }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
 
     return new Response(JSON.stringify({ response: content }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

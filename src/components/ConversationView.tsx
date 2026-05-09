@@ -4,7 +4,6 @@ import { Input } from "@/components/ui/input";
 import type { Message } from "@/types/burgess";
 import type { SavedConversation } from "@/hooks/useConversationStorage";
 import StaffDisplay from "./StaffDisplay";
-import { supabase } from "@/integrations/supabase/client";
 import { Shield, Maximize2, Copy, Mail, Send, Sparkles, RotateCcw, Info, Download, MoreVertical, X, WifiOff, Mic, MicOff, Volume2, VolumeX, BookOpen, Brain, Trash2, FileDown } from "lucide-react";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
@@ -17,8 +16,13 @@ import AccessibilityPanel from "./AccessibilityPanel";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import { offlineTemplates } from "@/lib/offlineTemplates";
 import { useAIMemory } from "@/hooks/useAIMemory";
+import { saveMemory } from "@/hooks/useAIMemory";
 import { useSpeechToText } from "@/hooks/useSpeechToText";
 import { useTextToSpeech } from "@/hooks/useTextToSpeech";
+import PrivacyConsentPanel from "./PrivacyConsentPanel";
+import { usePrivacyConsent } from "@/hooks/usePrivacyConsent";
+import { generateAdvocacyResponse, summarizeConversation } from "@/services/burgessCopilot";
+import { inferBurgessMetadata } from "@/domain/advocacy";
 import {
   Select,
   SelectContent,
@@ -75,6 +79,7 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
   const navigate = useNavigate();
   const { entries: journalEntries, addEntry, updateEntry } = useJournal();
   const aiMemory = useAIMemory();
+  const { settings: consent } = usePrivacyConsent();
   const isOnline = useOnlineStatus();
   const profile = conversation.profile;
   const isFirstConversation = conversation.messages.length === 0;
@@ -137,6 +142,7 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
         status: "pending",
         theirResponse: staffReplies || undefined,
         conversationId: conversation.id,
+        burgess: inferBurgessMetadata(messages.map((m) => m.content).join("\n")),
         followUps: staffDisplayMessages.slice(1).map((m) => ({
           date: m.timestamp instanceof Date ? m.timestamp.toISOString() : new Date(m.timestamp).toISOString(),
           content: m.content,
@@ -169,46 +175,35 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
   
 
   const callAI = async (systemContext: string, userMessage: string): Promise<string> => {
+    if (!consent.allowAiProcessing) {
+      throw new Error("AI processing is disabled in privacy controls");
+    }
     const memoryContext = aiMemory.getContextForPrompt();
-    const resp = await supabase.functions.invoke("burgess-copilot", {
-      body: { systemContext, userMessage, profile, memoryContext, conversationLog: messages.map(m => ({ role: m.role, content: m.content })) },
+    const response = await generateAdvocacyResponse({
+      systemContext,
+      userMessage,
+      profile,
+      memoryContext,
+      conversationLog: messages.map(m => ({ role: m.role, content: m.content })),
     });
-    if (resp.error) throw new Error(resp.error.message || "AI request failed");
-    return resp.data?.response || "I'm unable to generate a response right now. Please try again.";
+    return response.messageText;
   };
 
   const summarizeAndSaveMemory = () => {
-    if (messages.length < 2) return;
-    // Fire-and-forget: save directly to localStorage so it persists even after unmount
+    if (messages.length < 2 || !consent.allowMemorySummaries) return;
     const messagesSnapshot = messages.map(m => ({ role: m.role, content: m.content }));
     const profileSnapshot = { ...profile };
-    
-    supabase.functions.invoke("burgess-copilot", {
-      body: {
-        mode: "summarize",
-        profile: profileSnapshot,
-        conversationLog: messagesSnapshot,
-      },
-    }).then((resp) => {
-      if (resp.data?.summary) {
-        // Write directly to localStorage (component may have unmounted)
-        const STORAGE_KEY = "burgess-ai-memory";
-        let memory = { entries: [] as any[], preferredTone: "", updatedAt: "" };
-        try {
-          const raw = localStorage.getItem(STORAGE_KEY);
-          if (raw) memory = JSON.parse(raw);
-        } catch {}
-        
-        const newEntry = {
-          id: crypto.randomUUID(),
-          date: new Date().toISOString(),
-          ...resp.data.summary,
-        };
-        memory.entries = [newEntry, ...memory.entries].slice(0, 10);
-        memory.preferredTone = resp.data.summary.preferredTone || memory.preferredTone;
-        memory.updatedAt = new Date().toISOString();
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(memory));
-      }
+
+    summarizeConversation({
+      profile: profileSnapshot,
+      conversationLog: messagesSnapshot,
+    }).then((entry) => {
+      if (!entry) return;
+      saveMemory({
+        entries: [entry, ...aiMemory.memory.entries].slice(0, 10),
+        preferredTone: entry.preferredTone || aiMemory.memory.preferredTone,
+        updatedAt: new Date().toISOString(),
+      });
     }).catch((e) => {
       console.error("Failed to summarize conversation for memory:", e);
     });
@@ -229,7 +224,7 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
       const aiMsg: Message = { id: crypto.randomUUID(), role: "staff-display", content: response, timestamp: new Date() };
       setMessages(prev => [...prev, aiMsg]);
     } catch {
-      toast.error("Failed to generate response. Please try again.");
+      toast.error(consent.allowAiProcessing ? "Failed to generate response. Please try again." : "AI processing is disabled in privacy controls.");
     } finally {
       setIsLoading(false);
     }
@@ -250,7 +245,7 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
       const aiMsg: Message = { id: crypto.randomUUID(), role: "assistant", content: response, timestamp: new Date() };
       setMessages(prev => [...prev, aiMsg]);
     } catch {
-      toast.error("Failed to adjust response. Please try again.");
+      toast.error(consent.allowAiProcessing ? "Failed to adjust response. Please try again." : "AI processing is disabled in privacy controls.");
     } finally {
       setIsLoading(false);
     }
@@ -360,6 +355,7 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
               </Button>
             </div>
           )}
+          {showHints && <PrivacyConsentPanel />}
           {messages.map((msg) => (
             <div key={msg.id} className={`space-y-1 ${msg.role === "user" ? "ml-8" : "mr-4"}`}>
               <div
@@ -385,6 +381,11 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
                   </div>
                 )}
                 <div className="prose prose-sm max-w-none prose-p:my-1 prose-headings:my-2 prose-strong:text-inherit"><ReactMarkdown>{msg.content}</ReactMarkdown></div>
+                {msg.role === "staff-display" && inferBurgessMetadata(msg.content).blanketPolicyDetected && (
+                  <div className="mt-3 rounded-lg bg-background/15 p-2 text-xs">
+                    Burgess check: this message asks for individual consideration rather than a blanket policy.
+                  </div>
+                )}
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-xs text-muted-foreground">{msg.timestamp.toLocaleTimeString()}</span>
@@ -478,14 +479,14 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
               <div className="space-y-2">
                 <label className="text-sm font-medium text-foreground">What did the staff member say?</label>
                 <div className="flex gap-2">
-                  <Input
+                   <Input
                     value={staffReply}
                     onChange={(e) => setStaffReply(e.target.value)}
                     placeholder={staffSpeech.isListening ? "Listening..." : "Type or summarise their response..."}
                     className="h-12 text-base"
                     onKeyDown={(e) => e.key === "Enter" && handleStaffReply()}
-                    disabled={isLoading}
-                  />
+                     disabled={isLoading}
+                   />
                   {staffSpeech.isSupported && (
                     <Button
                       variant={staffSpeech.isListening ? "default" : "outline"}
@@ -497,10 +498,15 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
                       {staffSpeech.isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
                     </Button>
                   )}
-                  <Button onClick={handleStaffReply} disabled={isLoading || !staffReply.trim()} className="h-12 px-4" aria-label="Send message">
+                  <Button onClick={handleStaffReply} disabled={isLoading || !staffReply.trim() || !consent.allowAiProcessing} className="h-12 px-4" aria-label="Send message">
                     <Send className="w-4 h-4" />
                   </Button>
                 </div>
+                {!consent.allowAiProcessing && (
+                  <p className="text-xs text-muted-foreground">
+                    AI processing is off. Turn it on in privacy controls or use offline templates.
+                  </p>
+                )}
                 {showHints && (
                   <p className="text-xs text-muted-foreground">After you show the message, type what the staff member said back to you here.</p>
                 )}
@@ -530,7 +536,7 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
                       {aiSpeech.isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
                     </Button>
                   )}
-                  <Button variant="outline" onClick={handleAiHelper} disabled={isLoading || !aiHelper.trim()} className="h-10 px-3" aria-label="Send message">
+                  <Button variant="outline" onClick={handleAiHelper} disabled={isLoading || !aiHelper.trim() || !consent.allowAiProcessing} className="h-10 px-3" aria-label="Send message">
                     <Sparkles className="w-4 h-4" />
                   </Button>
                 </div>

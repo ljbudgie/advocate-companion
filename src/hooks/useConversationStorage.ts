@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import type { UserProfile, Message } from "@/types/burgess";
+import { browserStorage } from "@/storage/localStorageAdapter";
 
 export interface SavedConversation {
   id: string;
@@ -11,41 +12,35 @@ export interface SavedConversation {
 
 const STORAGE_KEY = "burgess-conversations";
 
-function loadAll(): SavedConversation[] {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
-    return JSON.parse(raw).map((c: SavedConversation) => ({
-      ...c,
-      messages: c.messages.map((m: any) => ({ ...m, timestamp: new Date(m.timestamp) })),
-    }));
-  } catch {
-    return [];
-  }
+type StoredMessage = Omit<Message, "timestamp"> & { timestamp: string | Date };
+type StoredConversation = Omit<SavedConversation, "messages"> & { messages: StoredMessage[] };
+
+function migrateConversations(value: unknown): SavedConversation[] {
+  if (!Array.isArray(value)) return [];
+  return value.map((c: StoredConversation) => ({
+    ...c,
+    messages: Array.isArray(c.messages)
+      ? c.messages.map((m) => ({ ...m, timestamp: new Date(m.timestamp) }))
+      : [],
+  }));
 }
 
-function saveAll(conversations: SavedConversation[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(conversations));
+export function loadAllConversations(): SavedConversation[] {
+  return browserStorage.load(STORAGE_KEY, [], migrateConversations);
+}
+
+export function saveAllConversations(conversations: SavedConversation[]) {
+  browserStorage.save(STORAGE_KEY, conversations);
 }
 
 export function useConversationStorage() {
-  const [conversations, setConversations] = useState<SavedConversation[]>(loadAll);
-
-  const save = useCallback((profile: UserProfile, messages: Message[]) => {
-    setConversations((prev) => {
-      const existing = prev.find((c) => c.profile.fullName === profile.fullName && c.createdAt === prev.find(p => p.profile === profile)?.createdAt);
-      // Always create / update by matching active id
-      const updated = [...prev];
-      saveAll(updated);
-      return updated;
-    });
-  }, []);
+  const [conversations, setConversations] = useState<SavedConversation[]>(loadAllConversations);
 
   const upsert = useCallback((conv: SavedConversation) => {
     setConversations((prev) => {
       const idx = prev.findIndex((c) => c.id === conv.id);
       const updated = idx >= 0 ? prev.map((c, i) => (i === idx ? conv : c)) : [conv, ...prev];
-      saveAll(updated);
+      saveAllConversations(updated);
       return updated;
     });
   }, []);
@@ -53,13 +48,13 @@ export function useConversationStorage() {
   const remove = useCallback((id: string) => {
     setConversations((prev) => {
       const updated = prev.filter((c) => c.id !== id);
-      saveAll(updated);
+      saveAllConversations(updated);
       return updated;
     });
   }, []);
 
   const refresh = useCallback(() => {
-    setConversations(loadAll());
+    setConversations(loadAllConversations());
   }, []);
 
   return { conversations, upsert, remove, refresh };

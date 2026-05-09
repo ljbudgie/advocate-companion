@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { browserStorage } from "@/storage/localStorageAdapter";
 
 export interface AIMemoryEntry {
   id: string;
@@ -17,19 +18,24 @@ export interface AIMemory {
 }
 
 const STORAGE_KEY = "burgess-ai-memory";
+const emptyMemory: AIMemory = { entries: [], preferredTone: "", updatedAt: "" };
 
-function loadMemory(): AIMemory {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return { entries: [], preferredTone: "", updatedAt: "" };
-    return JSON.parse(raw);
-  } catch {
-    return { entries: [], preferredTone: "", updatedAt: "" };
-  }
+function migrateMemory(value: unknown): AIMemory {
+  if (!value || typeof value !== "object") return emptyMemory;
+  const memory = value as Partial<AIMemory>;
+  return {
+    entries: Array.isArray(memory.entries) ? memory.entries : [],
+    preferredTone: memory.preferredTone || "",
+    updatedAt: memory.updatedAt || "",
+  };
 }
 
-function saveMemory(memory: AIMemory) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(memory));
+export function loadMemory(): AIMemory {
+  return browserStorage.load(STORAGE_KEY, emptyMemory, migrateMemory);
+}
+
+export function saveMemory(memory: AIMemory) {
+  browserStorage.save(STORAGE_KEY, memory);
 }
 
 export function useAIMemory() {

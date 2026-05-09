@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Shield, Plus, Trash2, MessageSquare, Brain, Download, X } from "lucide-react";
+import { Shield, Plus, Trash2, MessageSquare, Brain, Download, X, Mail } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import {
   Dialog,
   DialogContent,
@@ -23,6 +24,7 @@ interface ConversationHistoryProps {
 export default function ConversationHistory({ conversations, onResume, onNew, onDelete }: ConversationHistoryProps) {
   const [showMemory, setShowMemory] = useState(false);
   const aiMemory = useAIMemory();
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-background">
@@ -30,6 +32,9 @@ export default function ConversationHistory({ conversations, onResume, onNew, on
         <Shield className="w-5 h-5 text-accent" />
         <span className="font-serif font-semibold text-foreground">Burgess Principle</span>
         <div className="ml-auto">
+          <Button variant="ghost" size="icon" title="Email drafts" aria-label="View email drafts" onClick={() => navigate("/email-drafts")}>
+            <Mail className="w-4 h-4" />
+          </Button>
           <Button variant="ghost" size="icon" title="AI Memory" aria-label="View AI memory" onClick={() => setShowMemory(true)}>
             <Brain className="w-4 h-4" />
           </Button>

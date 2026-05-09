@@ -6,7 +6,7 @@ create table public.email_drafts (
   original_subject text not null default '',
   original_body text not null default '',
   generated_response text not null default '',
-  status text not null default 'pending' check (status in ('pending', 'sent')),
+  status text not null default 'pending' check (status in ('pending', 'sent', 'dismissed')),
   created_at timestamptz not null default now()
 );
 
