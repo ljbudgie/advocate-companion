@@ -7,6 +7,17 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
+const UUID_REGEX = /[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/i;
+
+function userIdFromClientState(clientState?: string): string | null {
+  if (!clientState) return null;
+  // Graph subscriptions should set clientState to a value containing the
+  // authenticated Supabase user UUID so webhook notifications can be mapped
+  // without using a placeholder account.
+  const match = clientState.match(UUID_REGEX);
+  return match?.[0] ?? null;
+}
+
 /**
  * Fetch a single message from Microsoft Graph by its ID.
  */
@@ -144,6 +155,12 @@ serve(async (req) => {
         continue;
       }
 
+      const userId = userIdFromClientState(notification.clientState);
+      if (!userId) {
+        console.warn("Notification missing user id in clientState, skipping");
+        continue;
+      }
+
       // Fetch the full message from Graph
       const message = await fetchGraphMessage(
         messageId,
@@ -163,15 +180,14 @@ serve(async (req) => {
       );
 
       // Persist the draft. Use upsert to avoid duplicate messageId errors
-      // if the same notification is delivered more than once.
-      // TODO: Implement proper user mapping (e.g. store user_id in Graph
-      // subscription clientState, or look up user by email address).
+      // if the same notification is delivered more than once. The Graph
+      // subscription clientState must carry the authenticated user's UUID.
       const { error: insertError } = await supabase
         .from("email_drafts")
         .upsert(
           {
             message_id: message.id,
-            user_id: "00000000-0000-0000-0000-000000000000",
+            user_id: userId,
             sender_address: senderAddress,
             original_subject: subject,
             original_body: bodyContent,

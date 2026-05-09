@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Shield, Send, X, Sparkles, Mail, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
+import { usePrivacyConsent } from "@/hooks/usePrivacyConsent";
 
 interface EmailDraft {
   id: string;
@@ -28,6 +29,7 @@ export default function EmailDraftReview() {
   const [loading, setLoading] = useState(true);
   const [adjustingId, setAdjustingId] = useState<string | null>(null);
   const [sendingId, setSendingId] = useState<string | null>(null);
+  const { settings: consent, update: updateConsent } = usePrivacyConsent();
 
   const fetchDrafts = useCallback(async () => {
     setLoading(true);
@@ -40,7 +42,7 @@ export default function EmailDraftReview() {
         return;
       }
 
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from("email_drafts")
         .select("*")
         .eq("user_id", user.id)
@@ -62,6 +64,10 @@ export default function EmailDraftReview() {
   }, [fetchDrafts]);
 
   const handleToneAdjust = async (draft: EmailDraft, tone: Tone) => {
+    if (!consent.allowEmailProcessing || !consent.allowAiProcessing) {
+      toast.error("Email processing or AI processing is disabled in privacy controls.");
+      return;
+    }
     setAdjustingId(draft.id);
     try {
       const safeSender = sanitizeForPrompt(draft.sender_address);
@@ -79,7 +85,7 @@ export default function EmailDraftReview() {
       const newResponse = resp.data?.response;
       if (!newResponse) throw new Error("Empty AI response");
 
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from("email_drafts")
         .update({ generated_response: newResponse })
         .eq("id", draft.id);
@@ -100,6 +106,10 @@ export default function EmailDraftReview() {
   };
 
   const handleSend = async (draft: EmailDraft) => {
+    if (!consent.allowEmailProcessing) {
+      toast.error("Email processing is disabled in privacy controls.");
+      return;
+    }
     setSendingId(draft.id);
     try {
       const {
@@ -124,7 +134,7 @@ export default function EmailDraftReview() {
 
   const handleDismiss = async (draft: EmailDraft) => {
     try {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from("email_drafts")
         .update({ status: "dismissed" })
         .eq("id", draft.id);
@@ -178,10 +188,24 @@ export default function EmailDraftReview() {
       </header>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        <div className="rounded-xl border bg-card p-4 space-y-3">
+          <p className="text-sm font-medium text-foreground">Email privacy controls</p>
+          <p className="text-xs text-muted-foreground">
+            Email drafts may include sensitive advocacy context. Enable this only if you want pending drafts processed through Supabase and the AI helper.
+          </p>
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={consent.allowEmailProcessing}
+              onChange={(event) => updateConsent({ allowEmailProcessing: event.target.checked })}
+            />
+            Allow email draft processing
+          </label>
+        </div>
         {drafts.map((draft) => {
           const isAdjusting = adjustingId === draft.id;
           const isSending = sendingId === draft.id;
-          const isBusy = isAdjusting || isSending;
+          const isBusy = isAdjusting || isSending || !consent.allowEmailProcessing;
 
           return (
             <div

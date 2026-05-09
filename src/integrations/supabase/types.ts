@@ -14,7 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      email_drafts: {
+        Row: {
+          id: string
+          user_id: string
+          message_id: string
+          sender_address: string
+          original_subject: string
+          original_body: string
+          generated_response: string
+          status: "pending" | "sent" | "dismissed"
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          message_id: string
+          sender_address: string
+          original_subject?: string
+          original_body?: string
+          generated_response?: string
+          status?: "pending" | "sent" | "dismissed"
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          message_id?: string
+          sender_address?: string
+          original_subject?: string
+          original_body?: string
+          generated_response?: string
+          status?: "pending" | "sent" | "dismissed"
+          created_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

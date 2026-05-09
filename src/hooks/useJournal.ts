@@ -1,29 +1,32 @@
 import { useState, useCallback } from "react";
 import type { JournalEntry } from "@/types/journal";
+import { browserStorage } from "@/storage/localStorageAdapter";
 
 const STORAGE_KEY = "burgess_journal";
 
-function loadEntries(): JournalEntry[] {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
-    return JSON.parse(raw) as JournalEntry[];
-  } catch {
-    return [];
-  }
+function migrateEntries(value: unknown): JournalEntry[] {
+  if (!Array.isArray(value)) return [];
+  return value.map((entry) => ({
+    followUps: [],
+    ...entry,
+  })) as JournalEntry[];
 }
 
-function saveEntries(entries: JournalEntry[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+export function loadJournalEntries(): JournalEntry[] {
+  return browserStorage.load(STORAGE_KEY, [], migrateEntries);
+}
+
+export function saveJournalEntries(entries: JournalEntry[]) {
+  browserStorage.save(STORAGE_KEY, entries);
 }
 
 export function useJournal() {
-  const [entries, setEntries] = useState<JournalEntry[]>(loadEntries);
+  const [entries, setEntries] = useState<JournalEntry[]>(loadJournalEntries);
 
   const addEntry = useCallback((entry: JournalEntry) => {
     setEntries((prev) => {
       const updated = [entry, ...prev];
-      saveEntries(updated);
+      saveJournalEntries(updated);
       return updated;
     });
   }, []);
@@ -31,7 +34,7 @@ export function useJournal() {
   const updateEntry = useCallback((id: string, patch: Partial<JournalEntry>) => {
     setEntries((prev) => {
       const updated = prev.map((e) => (e.id === id ? { ...e, ...patch } : e));
-      saveEntries(updated);
+      saveJournalEntries(updated);
       return updated;
     });
   }, []);
@@ -39,7 +42,7 @@ export function useJournal() {
   const deleteEntry = useCallback((id: string) => {
     setEntries((prev) => {
       const updated = prev.filter((e) => e.id !== id);
-      saveEntries(updated);
+      saveJournalEntries(updated);
       return updated;
     });
   }, []);

@@ -12,21 +12,47 @@ interface SpeechRecognitionEvent {
   resultIndex: number;
 }
 
+interface SpeechRecognitionErrorEvent {
+  error: string;
+  message?: string;
+}
+
+interface BrowserSpeechRecognition {
+  lang: string;
+  continuous: boolean;
+  interimResults: boolean;
+  onresult: (event: SpeechRecognitionEvent) => void;
+  onerror: (event: SpeechRecognitionErrorEvent) => void;
+  onend: () => void;
+  start: () => void;
+  stop: () => void;
+}
+
+type SpeechRecognitionConstructor = new () => BrowserSpeechRecognition;
+
+interface SpeechRecognitionWindow extends Window {
+  SpeechRecognition?: SpeechRecognitionConstructor;
+  webkitSpeechRecognition?: SpeechRecognitionConstructor;
+}
+
+function getSpeechRecognition(): SpeechRecognitionConstructor | undefined {
+  const speechWindow = window as SpeechRecognitionWindow;
+  return speechWindow.SpeechRecognition || speechWindow.webkitSpeechRecognition;
+}
+
 export function useSpeechToText(options: UseSpeechToTextOptions = {}) {
   const { onResult, onEnd, lang = "en-GB", continuous = false } = options;
   const [isListening, setIsListening] = useState(false);
   const [isSupported, setIsSupported] = useState(false);
-  const recognitionRef = useRef<any>(null);
+  const recognitionRef = useRef<BrowserSpeechRecognition | null>(null);
 
   useEffect(() => {
-    const SpeechRecognition =
-      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const SpeechRecognition = getSpeechRecognition();
     setIsSupported(!!SpeechRecognition);
   }, []);
 
   const start = useCallback(() => {
-    const SpeechRecognition =
-      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const SpeechRecognition = getSpeechRecognition();
     if (!SpeechRecognition) return;
 
     const recognition = new SpeechRecognition();
