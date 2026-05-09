@@ -479,14 +479,14 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
               <div className="space-y-2">
                 <label className="text-sm font-medium text-foreground">What did the staff member say?</label>
                 <div className="flex gap-2">
-                   <Input
+                  <Input
                     value={staffReply}
                     onChange={(e) => setStaffReply(e.target.value)}
                     placeholder={staffSpeech.isListening ? "Listening..." : "Type or summarise their response..."}
                     className="h-12 text-base"
                     onKeyDown={(e) => e.key === "Enter" && handleStaffReply()}
-                     disabled={isLoading}
-                   />
+                    disabled={isLoading}
+                  />
                   {staffSpeech.isSupported && (
                     <Button
                       variant={staffSpeech.isListening ? "default" : "outline"}
