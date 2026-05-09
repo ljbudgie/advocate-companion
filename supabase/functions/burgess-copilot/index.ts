@@ -5,6 +5,8 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+const CODE_FENCE_REGEX = /```(?:json)?\n?/g;
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -65,7 +67,7 @@ Keep each field concise (1-2 sentences max). If a field isn't applicable, use an
       const data = await response.json();
       const raw = data.choices?.[0]?.message?.content || "{}";
       // Strip markdown code fences if present
-      const cleaned = raw.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+      const cleaned = raw.replace(CODE_FENCE_REGEX, "").trim();
 
       try {
         const summary = JSON.parse(cleaned);
@@ -174,7 +176,9 @@ Return only JSON in this shape:
     const content = data.choices?.[0]?.message?.content || "Unable to generate a response.";
 
     if (responseFormat === "structured") {
-      const cleaned = content.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+      // If the model does not return valid structured JSON, fall back to the
+      // plain response so the client can infer metadata locally.
+      const cleaned = content.replace(CODE_FENCE_REGEX, "").trim();
       try {
         const structured = JSON.parse(cleaned);
         return new Response(JSON.stringify({ structured, response: structured.messageText || content }), {

@@ -65,7 +65,7 @@ export default function EmailDraftReview() {
 
   const handleToneAdjust = async (draft: EmailDraft, tone: Tone) => {
     if (!consent.allowEmailProcessing || !consent.allowAiProcessing) {
-      toast.error("Email AI processing is disabled in privacy controls.");
+      toast.error("Email processing or AI processing is disabled in privacy controls.");
       return;
     }
     setAdjustingId(draft.id);

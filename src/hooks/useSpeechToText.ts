@@ -12,12 +12,17 @@ interface SpeechRecognitionEvent {
   resultIndex: number;
 }
 
+interface SpeechRecognitionErrorEvent {
+  error: string;
+  message?: string;
+}
+
 interface BrowserSpeechRecognition {
   lang: string;
   continuous: boolean;
   interimResults: boolean;
   onresult: (event: SpeechRecognitionEvent) => void;
-  onerror: () => void;
+  onerror: (event: SpeechRecognitionErrorEvent) => void;
   onend: () => void;
   start: () => void;
   stop: () => void;

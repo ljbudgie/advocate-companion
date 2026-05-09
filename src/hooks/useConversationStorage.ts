@@ -18,7 +18,8 @@ type StoredConversation = Omit<SavedConversation, "messages"> & { messages: Stor
 function migrateConversations(value: unknown): SavedConversation[] {
   if (!Array.isArray(value)) return [];
   // Stored records may come from older localStorage snapshots where dates were
-  // serialized to strings; normalize them before React components consume them.
+  // serialized to strings; missing or invalid timestamps become Invalid Date
+  // objects and are still preserved for follow-up repair/export flows.
   return value.map((c: StoredConversation) => ({
     ...c,
     messages: Array.isArray(c.messages)

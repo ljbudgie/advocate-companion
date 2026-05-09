@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { Message } from "@/types/burgess";
@@ -105,6 +105,10 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [showMemory, setShowMemory] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const burgessByMessageId = useMemo(
+    () => new Map(messages.map((message) => [message.id, inferBurgessMetadata(message.content)])),
+    [messages],
+  );
 
   const staffSpeech = useSpeechToText({
     onResult: (transcript) => setStaffReply((prev) => (prev ? prev + " " : "") + transcript),
@@ -380,7 +384,7 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
                   </div>
                 )}
                 <div className="prose prose-sm max-w-none prose-p:my-1 prose-headings:my-2 prose-strong:text-inherit"><ReactMarkdown>{msg.content}</ReactMarkdown></div>
-                {msg.role === "staff-display" && inferBurgessMetadata(msg.content).blanketPolicyDetected && (
+                {msg.role === "staff-display" && burgessByMessageId.get(msg.id)?.blanketPolicyDetected && (
                   <div className="mt-3 rounded-lg bg-background/15 p-2 text-xs">
                     Burgess check: this message asks for individual consideration rather than a blanket policy.
                   </div>

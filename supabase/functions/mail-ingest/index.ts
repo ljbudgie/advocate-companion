@@ -7,12 +7,14 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
+const UUID_REGEX = /[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/i;
+
 function userIdFromClientState(clientState?: string): string | null {
   if (!clientState) return null;
   // Graph subscriptions should set clientState to a value containing the
   // authenticated Supabase user UUID so webhook notifications can be mapped
   // without using a placeholder account.
-  const match = clientState.match(/[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/i);
+  const match = clientState.match(UUID_REGEX);
   return match?.[0] ?? null;
 }
 
