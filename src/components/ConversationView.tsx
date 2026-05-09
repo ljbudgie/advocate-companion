@@ -16,7 +16,6 @@ import AccessibilityPanel from "./AccessibilityPanel";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import { offlineTemplates } from "@/lib/offlineTemplates";
 import { useAIMemory } from "@/hooks/useAIMemory";
-import { saveMemory } from "@/hooks/useAIMemory";
 import { useSpeechToText } from "@/hooks/useSpeechToText";
 import { useTextToSpeech } from "@/hooks/useTextToSpeech";
 import PrivacyConsentPanel from "./PrivacyConsentPanel";
@@ -199,7 +198,7 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
       conversationLog: messagesSnapshot,
     }).then((entry) => {
       if (!entry) return;
-      saveMemory({
+      aiMemory.persistMemory({
         entries: [entry, ...aiMemory.memory.entries].slice(0, 10),
         preferredTone: entry.preferredTone || aiMemory.memory.preferredTone,
         updatedAt: new Date().toISOString(),

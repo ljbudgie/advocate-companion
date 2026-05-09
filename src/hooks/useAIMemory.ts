@@ -34,7 +34,7 @@ export function loadMemory(): AIMemory {
   return browserStorage.load(STORAGE_KEY, emptyMemory, migrateMemory);
 }
 
-export function saveMemory(memory: AIMemory) {
+function saveMemory(memory: AIMemory) {
   browserStorage.save(STORAGE_KEY, memory);
 }
 
@@ -76,6 +76,10 @@ export function useAIMemory() {
     });
   }, []);
 
+  const persistMemory = useCallback((updated: AIMemory) => {
+    saveMemory(updated);
+  }, []);
+
   const getContextForPrompt = useCallback((): string => {
     if (memory.entries.length === 0) return "";
 
@@ -106,5 +110,5 @@ export function useAIMemory() {
     return lines.join("\n");
   }, [memory]);
 
-  return { memory, addEntry, removeEntry, clearMemory, getContextForPrompt };
+  return { memory, addEntry, removeEntry, clearMemory, persistMemory, getContextForPrompt };
 }
