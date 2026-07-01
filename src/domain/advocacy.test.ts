@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { classifyBurgess, inferBurgessMetadata } from "./advocacy";
+import {
+  classifyBurgess,
+  inferBurgessMetadata,
+  isEscalationWarranted,
+  resolveEffectiveOutcome,
+} from "./advocacy";
 
 describe("inferBurgessMetadata", () => {
   it("detects blanket-policy language and individual consideration requests", () => {
@@ -42,5 +47,30 @@ describe("classifyBurgess", () => {
 
   it("returns AMBIGUOUS when the position is unclear", () => {
     expect(classifyBurgess(base)).toBe("AMBIGUOUS");
+  });
+});
+
+describe("resolveEffectiveOutcome", () => {
+  it("keeps SOVEREIGN as SOVEREIGN", () => {
+    expect(resolveEffectiveOutcome("SOVEREIGN")).toBe("SOVEREIGN");
+  });
+
+  it("treats NULL as NULL", () => {
+    expect(resolveEffectiveOutcome("NULL")).toBe("NULL");
+  });
+
+  it("collapses AMBIGUOUS to NULL until clarified", () => {
+    expect(resolveEffectiveOutcome("AMBIGUOUS")).toBe("NULL");
+  });
+});
+
+describe("isEscalationWarranted", () => {
+  it("does not warrant escalation for SOVEREIGN", () => {
+    expect(isEscalationWarranted("SOVEREIGN")).toBe(false);
+  });
+
+  it("warrants escalation for both NULL and AMBIGUOUS", () => {
+    expect(isEscalationWarranted("NULL")).toBe(true);
+    expect(isEscalationWarranted("AMBIGUOUS")).toBe(true);
   });
 });

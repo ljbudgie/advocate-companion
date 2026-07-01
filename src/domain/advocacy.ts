@@ -185,6 +185,35 @@ export function classifyBurgess(
   return "AMBIGUOUS";
 }
 
+/**
+ * The effective (actionable) outcome once the ecosystem tie-break rule is
+ * applied. AMBIGUOUS is not a third resting state: until a named reviewer is
+ * confirmed to have looked at the specific facts, it collapses to NULL. This
+ * mirrors the guidance surfaced to users on the About page ("Treat this as
+ * NULL until it is clarified").
+ */
+export type BurgessEffectiveOutcome = "SOVEREIGN" | "NULL";
+
+/**
+ * Resolve a three-outcome classification into the two-outcome effective result
+ * used for gating escalation and repair. AMBIGUOUS is treated as NULL until it
+ * is clarified; only a confirmed SOVEREIGN outcome stays SOVEREIGN.
+ */
+export function resolveEffectiveOutcome(
+  classification: BurgessClassification,
+): BurgessEffectiveOutcome {
+  return classification === "SOVEREIGN" ? "SOVEREIGN" : "NULL";
+}
+
+/**
+ * Whether the documented starting point for asking again, escalating, and
+ * putting things right applies. Both NULL and AMBIGUOUS warrant escalation;
+ * only a confirmed SOVEREIGN outcome does not.
+ */
+export function isEscalationWarranted(classification: BurgessClassification): boolean {
+  return resolveEffectiveOutcome(classification) === "NULL";
+}
+
 export function inferBurgessMetadata(text: string): BurgessPrincipleMetadata {
   const lower = text.toLowerCase();
   const blanketPolicyDetected = /blanket|policy|standard procedure|everyone|same rule|can't make exceptions/.test(lower);

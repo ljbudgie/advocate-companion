@@ -21,7 +21,7 @@ import { useTextToSpeech } from "@/hooks/useTextToSpeech";
 import PrivacyConsentPanel from "./PrivacyConsentPanel";
 import { usePrivacyConsent } from "@/hooks/usePrivacyConsent";
 import { generateAdvocacyResponse, summarizeConversation } from "@/services/burgessCopilot";
-import { inferBurgessMetadata } from "@/domain/advocacy";
+import { inferBurgessMetadata, resolveEffectiveOutcome } from "@/domain/advocacy";
 import {
   Select,
   SelectContent,
@@ -393,7 +393,8 @@ export default function ConversationView({ conversation, onSave, onReset }: Conv
                 {msg.role === "staff-display" && getBurgessMetadata(msg).blanketPolicyDetected && (
                   <div className="mt-3 rounded-lg bg-background/15 p-2 text-xs">
                     Burgess check: this message asks for a named person to personally review your specific
-                    situation (SOVEREIGN) rather than applying a blanket policy (NULL).
+                    situation (SOVEREIGN) rather than applying a blanket policy (
+                    {resolveEffectiveOutcome(getBurgessMetadata(msg).classification)}).
                   </div>
                 )}
               </div>
