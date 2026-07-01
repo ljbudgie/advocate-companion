@@ -193,17 +193,21 @@ export function inferBurgessMetadata(text: string): BurgessPrincipleMetadata {
   const reasonsRequested = /reason|explain|why|in writing/.test(lower);
   const alternativesConsidered = /alternative|another way|option|adjustment/.test(lower);
 
-  const signal = {
+  let blanketPolicyLikelihood: BurgessPrincipleMetadata["blanketPolicyLikelihood"] = "low";
+  if (blanketPolicyDetected) {
+    blanketPolicyLikelihood = "high";
+  } else if (sovereignQuestionAsked) {
+    blanketPolicyLikelihood = "medium";
+  }
+
+  const signal: Omit<BurgessPrincipleMetadata, "classification"> = {
     sovereignQuestionAsked,
     blanketPolicyDetected,
     decisionMakerIdentified,
     reasonsRequested,
     alternativesConsidered,
-    blanketPolicyLikelihood: (blanketPolicyDetected ? "high" : sovereignQuestionAsked ? "medium" : "low") as
-      | "low"
-      | "medium"
-      | "high",
-    auditNotes: [] as string[],
+    blanketPolicyLikelihood,
+    auditNotes: [],
   };
 
   return {
