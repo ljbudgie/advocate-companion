@@ -1,6 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import type { BurgessPrincipleMetadata } from "@/domain/advocacy";
-import { inferBurgessMetadata } from "@/domain/advocacy";
+import { classifyBurgess, inferBurgessMetadata } from "@/domain/advocacy";
 import type { Message, UserProfile } from "@/types/burgess";
 import type { AIMemoryEntry } from "@/hooks/useAIMemory";
 
@@ -25,13 +25,26 @@ interface SummaryRequest {
   conversationLog: Pick<Message, "role" | "content">[];
 }
 
+function normalizeBurgessMetadata(
+  burgess: BurgessPrincipleMetadata | undefined,
+  fallbackText: string,
+): BurgessPrincipleMetadata {
+  if (!burgess) return inferBurgessMetadata(fallbackText);
+  // Backfill the three-outcome classification when the AI omits it, so the
+  // client is always aligned with the ecosystem SOVEREIGN/NULL/AMBIGUOUS model.
+  return {
+    ...burgess,
+    classification: burgess.classification || classifyBurgess(burgess),
+  };
+}
+
 function parseStructuredResponse(value: unknown): StructuredAiResponse {
   if (value && typeof value === "object") {
     const data = value as Partial<StructuredAiResponse> & { response?: string };
     const messageText = data.messageText || data.response || "";
     return {
       messageText,
-      burgess: data.burgess || inferBurgessMetadata(messageText),
+      burgess: normalizeBurgessMetadata(data.burgess, messageText),
       nextSteps: Array.isArray(data.nextSteps) ? data.nextSteps : [],
       riskFlags: Array.isArray(data.riskFlags) ? data.riskFlags : [],
       citations: Array.isArray(data.citations) ? data.citations : [],

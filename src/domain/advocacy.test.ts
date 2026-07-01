@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { inferBurgessMetadata } from "./advocacy";
+import { classifyBurgess, inferBurgessMetadata } from "./advocacy";
 
 describe("inferBurgessMetadata", () => {
   it("detects blanket-policy language and individual consideration requests", () => {
@@ -11,5 +11,36 @@ describe("inferBurgessMetadata", () => {
     expect(metadata.sovereignQuestionAsked).toBe(true);
     expect(metadata.reasonsRequested).toBe(true);
     expect(metadata.blanketPolicyLikelihood).toBe("high");
+  });
+
+  it("assigns a three-outcome classification to every inference", () => {
+    const metadata = inferBurgessMetadata("Everyone has to follow the same rule, no exceptions.");
+    expect(["SOVEREIGN", "NULL", "AMBIGUOUS"]).toContain(metadata.classification);
+  });
+});
+
+describe("classifyBurgess", () => {
+  const base = {
+    sovereignQuestionAsked: false,
+    blanketPolicyDetected: false,
+    decisionMakerIdentified: false,
+    reasonsRequested: false,
+    alternativesConsidered: false,
+    blanketPolicyLikelihood: "low" as const,
+    auditNotes: [] as string[],
+  };
+
+  it("returns SOVEREIGN when a named decision-maker considered the individual case", () => {
+    expect(
+      classifyBurgess({ ...base, decisionMakerIdentified: true, sovereignQuestionAsked: true }),
+    ).toBe("SOVEREIGN");
+  });
+
+  it("returns NULL when a blanket policy is applied without individual review", () => {
+    expect(classifyBurgess({ ...base, blanketPolicyDetected: true })).toBe("NULL");
+  });
+
+  it("returns AMBIGUOUS when the position is unclear", () => {
+    expect(classifyBurgess(base)).toBe("AMBIGUOUS");
   });
 });

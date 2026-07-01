@@ -318,6 +318,7 @@ interface AdjustmentRequest {
 }
 
 interface BurgessPrincipleMetadata {
+  classification: "SOVEREIGN" | "NULL" | "AMBIGUOUS"; // three-outcome ecosystem test result
   sovereignQuestionAsked: boolean;
   individualConsiderationEvidence?: string;
   blanketPolicyDetected: boolean;
@@ -362,10 +363,13 @@ Current enforcement patterns:
 - **Memory loop:** local AI memory summarizes what worked, preferred tone, staff response patterns, and lessons learned.
 - **Offline continuity:** bundled templates keep the user supported even when AI or internet access is unavailable.
 
-In this framing:
+In this framing, aligned with the wider ecosystem (burgess-principle v2.6.6, Mirror), every institutional response is classified into one of three outcomes:
 
-- **SOVEREIGN** means a real decision-maker considers the user's specific circumstances, access needs, evidence, and proposed adjustment.
+- **SOVEREIGN** means a named decision-maker considers the user's specific circumstances, access needs, evidence, and proposed adjustment.
 - **NULL** means a decision is produced by blanket policy, automation, convenience, refusal scripts, or institutional habit without meaningful individual consideration.
+- **AMBIGUOUS** means the institution replies with vague process language ("human oversight", "reviewed in line with policy") without confirming that a named reviewer considered the user's specific facts. AMBIGUOUS is treated as NULL until clarified.
+
+NULL and AMBIGUOUS are the documented starting point for escalation and repair, not a final verdict.
 
 Proposed improvements:
 
