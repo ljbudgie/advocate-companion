@@ -16,7 +16,40 @@ export interface ConsentSettings {
   updatedAt: string;
 }
 
+/**
+ * The Burgess Principle binary test, applied across the ecosystem
+ * (burgess-principle, Mirror, OpenHear). One question decides the outcome:
+ * "Was a named human being's mind applied to the specific facts of this
+ * person's case before institutional power was exercised?"
+ */
+export const BURGESS_BINARY_QUESTION =
+  "Was a human member of the team able to personally review the specific facts of my specific situation?";
+
+/**
+ * Legal grounding shared with the wider ecosystem (framework v2.6.6).
+ * These operationalise the "meaningful human involvement" requirement.
+ */
+export const BURGESS_LEGAL_REFERENCES = [
+  "Data (Use and Access) Act 2025 (s.80) / UK GDPR Articles 22A–22D (in force 5 February 2026)",
+  "EU AI Act Article 14",
+  "Equality Act 2010 (UK reasonable-adjustment duty)",
+  "Americans with Disabilities Act (ADA, US)",
+] as const;
+
+/**
+ * The three canonical outcomes of the Burgess binary test.
+ * - SOVEREIGN: a named human individually reviewed the specific facts before acting.
+ * - NULL: no individual human review took place; the decision was processed, not considered.
+ * - AMBIGUOUS: vague process language without confirming a named reviewer looked at the specific facts.
+ *
+ * NULL and AMBIGUOUS are the documented starting point for escalation and repair,
+ * not a final verdict.
+ */
+export type BurgessClassification = "SOVEREIGN" | "NULL" | "AMBIGUOUS";
+
 export interface BurgessPrincipleMetadata {
+  /** Three-outcome classification aligned with the ecosystem framework. */
+  classification: BurgessClassification;
   sovereignQuestionAsked: boolean;
   individualConsiderationEvidence?: string;
   blanketPolicyDetected: boolean;
@@ -116,6 +149,7 @@ export interface CaseFile {
 }
 
 export const defaultBurgessMetadata: BurgessPrincipleMetadata = {
+  classification: "AMBIGUOUS",
   sovereignQuestionAsked: false,
   blanketPolicyDetected: false,
   decisionMakerIdentified: false,
@@ -125,6 +159,61 @@ export const defaultBurgessMetadata: BurgessPrincipleMetadata = {
   auditNotes: [],
 };
 
+/**
+ * Classify a Burgess metadata signal into one of the three canonical outcomes.
+ * - A named decision-maker plus evidence of individual consideration is SOVEREIGN.
+ * - Detected blanket-policy language with no evidence of individual review is NULL.
+ * - Anything else (unclear or vague process language) is AMBIGUOUS, which the
+ *   ecosystem treats as NULL until clarified.
+ */
+export function classifyBurgess(
+  metadata: Omit<BurgessPrincipleMetadata, "classification">,
+): BurgessClassification {
+  const hasIndividualConsideration =
+    metadata.sovereignQuestionAsked ||
+    Boolean(metadata.individualConsiderationEvidence) ||
+    Boolean(metadata.alternativesConsidered);
+
+  if (metadata.decisionMakerIdentified && hasIndividualConsideration) {
+    return "SOVEREIGN";
+  }
+
+  if (metadata.blanketPolicyDetected && !hasIndividualConsideration) {
+    return "NULL";
+  }
+
+  return "AMBIGUOUS";
+}
+
+/**
+ * The effective (actionable) outcome once the ecosystem tie-break rule is
+ * applied. AMBIGUOUS is not a third resting state: until a named reviewer is
+ * confirmed to have looked at the specific facts, it collapses to NULL. This
+ * mirrors the guidance surfaced to users on the About page ("Treat this as
+ * NULL until it is clarified").
+ */
+export type BurgessEffectiveOutcome = "SOVEREIGN" | "NULL";
+
+/**
+ * Resolve a three-outcome classification into the two-outcome effective result
+ * used for gating escalation and repair. AMBIGUOUS is treated as NULL until it
+ * is clarified; only a confirmed SOVEREIGN outcome stays SOVEREIGN.
+ */
+export function resolveEffectiveOutcome(
+  classification: BurgessClassification,
+): BurgessEffectiveOutcome {
+  return classification === "SOVEREIGN" ? "SOVEREIGN" : "NULL";
+}
+
+/**
+ * Whether the documented starting point for asking again, escalating, and
+ * putting things right applies. Both NULL and AMBIGUOUS warrant escalation;
+ * only a confirmed SOVEREIGN outcome does not.
+ */
+export function isEscalationWarranted(classification: BurgessClassification): boolean {
+  return resolveEffectiveOutcome(classification) === "NULL";
+}
+
 export function inferBurgessMetadata(text: string): BurgessPrincipleMetadata {
   const lower = text.toLowerCase();
   const blanketPolicyDetected = /blanket|policy|standard procedure|everyone|same rule|can't make exceptions/.test(lower);
@@ -133,13 +222,25 @@ export function inferBurgessMetadata(text: string): BurgessPrincipleMetadata {
   const reasonsRequested = /reason|explain|why|in writing/.test(lower);
   const alternativesConsidered = /alternative|another way|option|adjustment/.test(lower);
 
-  return {
+  let blanketPolicyLikelihood: BurgessPrincipleMetadata["blanketPolicyLikelihood"] = "low";
+  if (blanketPolicyDetected) {
+    blanketPolicyLikelihood = "high";
+  } else if (sovereignQuestionAsked) {
+    blanketPolicyLikelihood = "medium";
+  }
+
+  const signal: Omit<BurgessPrincipleMetadata, "classification"> = {
     sovereignQuestionAsked,
     blanketPolicyDetected,
     decisionMakerIdentified,
     reasonsRequested,
     alternativesConsidered,
-    blanketPolicyLikelihood: blanketPolicyDetected ? "high" : sovereignQuestionAsked ? "medium" : "low",
+    blanketPolicyLikelihood,
     auditNotes: [],
+  };
+
+  return {
+    ...signal,
+    classification: classifyBurgess(signal),
   };
 }

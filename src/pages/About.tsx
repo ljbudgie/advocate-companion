@@ -29,11 +29,11 @@ export default function About() {
 
         <div className="space-y-5 text-base text-foreground leading-relaxed">
           <p>
-            The Burgess Principle is built on one straightforward idea:
+            The Burgess Principle is built on one straightforward question:
           </p>
 
           <blockquote className="border-l-4 border-accent pl-4 py-2 bg-accent/5 rounded-r-lg text-lg font-medium">
-            Before a decision is made about you, someone should actually look at <em>your</em> situation — not just apply a blanket rule.
+            Was a human able to personally review the specific facts of <em>your</em> situation — or was a blanket rule simply applied?
           </blockquote>
 
           <p>
@@ -41,7 +41,29 @@ export default function About() {
           </p>
 
           <p>
-            But people aren't all the same. What works for one person might be impossible — or unfair — for another. The Burgess Principle says that a real person should consider your individual circumstances before making a decision that affects you.
+            But people aren't all the same. What works for one person might be impossible — or unfair — for another. The Burgess Principle says that a real, named person should consider your individual circumstances before making a decision that affects you.
+          </p>
+
+          <h2 className="text-xl font-serif font-semibold pt-2">The three answers</h2>
+
+          <p>
+            Every institutional response falls into one of three outcomes:
+          </p>
+
+          <ul className="space-y-2 list-none pl-0">
+            <li>
+              <strong>SOVEREIGN</strong> — a named human individually reviewed the specific facts of your case before acting.
+            </li>
+            <li>
+              <strong>NULL</strong> — no individual human review took place. The decision was processed, not considered.
+            </li>
+            <li>
+              <strong>AMBIGUOUS</strong> — vague process language ("human oversight", "reviewed in line with policy") without confirming that a named reviewer actually looked at <em>your</em> facts. Treat this as NULL until it is clarified.
+            </li>
+          </ul>
+
+          <p>
+            NULL and AMBIGUOUS are not the end of the road — they are the documented starting point for asking again, escalating, and putting things right.
           </p>
 
           <h2 className="text-xl font-serif font-semibold pt-2">Who is it for?</h2>
@@ -59,7 +81,7 @@ export default function About() {
           <h2 className="text-xl font-serif font-semibold pt-2">Is it legal?</h2>
 
           <p>
-            The Burgess Principle is a registered UK Certification Mark. In many countries, there are laws that require organisations to consider individual circumstances — like the Equality Act 2010 in the UK or the ADA in the US. This tool helps you reference those rights in plain language, without needing to be a lawyer.
+            The Burgess Principle is a registered UK Certification Mark. In many places, the law already requires organisations to consider individual circumstances or to provide meaningful human review — like the Equality Act 2010 and the right to meaningful human involvement under UK GDPR Articles 22A–22D (Data (Use and Access) Act 2025) in the UK, the EU AI Act (Article 14), or the ADA in the US. This tool helps you reference those rights in plain language, without needing to be a lawyer.
           </p>
         </div>
 
